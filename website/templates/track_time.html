@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> {{ _('Time Tracking') }}</title>
+    <style>
+        body {
+            font-family:'Arial', sans-serif;
+            background-color: #f8f1f1;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 50%;
+            padding:20px;
+            background-color: #fff;
+            border-radius: 15px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #fcf6f6;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 8px;
+            text-align: center;
+            color: #333;
+        }
+
+        td {
+            padding: 0; 
+            width: 15px; 
+            height: 15px;
+            text-align: center;
+            font-size: 6px; 
+            border: 1px solid#ddd;
+            border-radius: 5px;
+            transition: background-color 0.3s ease,transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        td:hover {
+            transform: scale(1.2); 
+            background-color: #e0e0e0;}
+
+        
+        td.time-spent {
+            background-color: white; 
+        }
+
+        .time-bar {
+            width: 100%;
+            height: 3px;
+            background-color: #4caf50;
+            border-radius: 3px;
+        }
+
+        .time-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #4caf50;
+            margin: 0 auto;
+        }
+
+        td.weekend {
+            background-color: #f8f8f8;
+        }
+        h1 {
+            font-size: 18px;
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding:15px;
+            }
+
+            td {
+                width: 12px; 
+                height: 12px;
+                font-size: 5px; 
+            }
+
+            h1 {
+                font-size: 16px ;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Time Tracking for {{ current_year }}</h1>
+        <table>
+            <tbody>
+                {% for month, days in all_months.items() %}
+                    <tr>
+                        {% for day in days %}
+                            {% set is_weekend = day.weekday() in [5, 6] %}
+                            {% set time_spent = times_by_month[month][day.day] %}
+                            {% set time_percentage = (time_spent / 86400) * 100 %}
+                            {% set max_time = 4 * 3600 %}
+                            <td class="{{ 'weekend' if is_weekend else '' }}"
+                                style="background-color: 
+                                    {% set capped = [time_spent, max_time]|min %}
+                                    {% set intensity = (capped / max_time) * 100 %}
+                                    {% if time_spent > 0 %}
+                                        hsl(120, 70%, {{ 100 - intensity / 2 }}%);
+                                    {% else %}
+                                        white;
+                                    {% endif %}
+                                ">
+                                test time :{{ time_spent }}
+                                {% if time_spent > 0 %}
+                                    <div class="time-bar" style="width: {{ time_percentage }}%;"></div>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+    </div>
+</body>
+
+<script>
+    function refreshTimeTable() {
+        fetch('/time-tracking-table')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('time-tracking-table').innerHTML = html;
+            });
+    }
+   setInterval(refreshTimeTable, 10000);
+</script>
+
+</html>

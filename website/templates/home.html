@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}{{ -('Home') }}{% endblock %}
+
+{% block content %}
+<h1 align="center">{{ _('Notes') }}</h1>
+
+<p align="center"><a href="{{ url_for('questions.questionnaire') }}" class="btn btn-info">Start Full revision</a></p>
+<!-- clasa -->
+<form method="POST" action="{{ url_for('questions.questionnaire') }}" align="center" style="margin-bottom: 20px;">
+    <label for="grade"><strong>Select Grade:</strong></label>
+    <select name="grade" id="grade" class="form-control" style="display: inline-block; width: auto; margin: 0 10px;">
+        <option value="9">{{ _('Grade') }} 9</option>
+        <option value="10">{{ _('Grade ') }} 10</option>
+        <option value="11">{{ _('Grade ') }}11</option>
+        <option value="12">{{ _('Grade ') }} 12</option>
+    </select>
+    <button type="submit" class="btn btn-info"> {{ _('Start Flashcards Quiz') }}</button>
+</form>
+<!-- timp -->
+{% if minutes_spent_today is not none %}
+<p align="center" style="margin-top: 10px; color: #555;" id="time-spent-message">
+    {{ minutes_spent_today }} {{ _(' minutes spent on site today') }}
+</p>
+
+{% endif %}
+<ul class="list-group list-group-flush" id="notes">
+    {% for note in user.notes %}
+    <li class="list-group-item" id="note-{{ note.id }}">
+        <p>{{ note.data }}</p>
+        <small class="text-muted">
+           {{ _(' Created at:') }} {{ note.date.strftime('%Y-%m-%d %H:%M:%S') }}
+        </small>
+        <button type="button" class="close" onClick="deleteNote({{ note.id }})">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </li>
+    {% endfor %}
+</ul>
+
+<form method="POST">
+    <textarea name="note" id="note" class="form-control"></textarea>
+    <br />
+    <div align="center">
+        <button type="submit" class="btn btn-primary">{{ _('Add Note') }}</button>
+    </div>
+</form>
+
+<script>
+    // js bye bye note
+    function deleteNote(noteId) {
+        if (confirm('Are you sure you want to delete this note?')) {
+            fetch('/delete-note', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ noteId: noteId }), // note la server
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelector(`#note-${noteId}`).remove();
+                } else {
+                    alert('Error deleting the note!');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting the note!');
+            });
+        }
+    }
+
+    function fetchAndDisplayTime() {
+        fetch('/show-time-json')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('time-spent-message').textContent =
+                    ` ${data.minutes} minutes spent on site today`;
+            });
+    }
+    setInterval(() => {
+        fetch('/update-time', { method: 'POST' }).then(fetchAndDisplayTime);
+    }, 10000);  // 10 seconds
+
+    // 1st fetch
+    fetchAndDisplayTime();
+
+</script>
+
+{% endblock %}

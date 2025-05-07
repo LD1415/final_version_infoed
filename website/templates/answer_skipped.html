@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Answer Skipped Question ') }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">{{ _('Answer the Skipped Question') }}</h2>
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="question">{{ question.question }}</label>
+            <input type="text" class="form-control" name="user_answer" required>
+        </div>
+        <button type="submit" class="btn btn-primary"> {{ _('Submit Answer') }}</button>
+    </form>
+
+    <form method="POST" class="mt-2">
+        <input type="hidden" name="show_answer" value="true">
+        <button type="submit" name="show_answer" class="btn btn-warning">{{ _('Show Correct Answer') }}</button>
+    </form>
+
+    {% if feedback %}
+        {% if feedback == 'correct' %}
+            <div class="alert alert-success mt-4">{{ _('Correct!') }}</div>
+            {% if next_question %}
+                <form method="GET" action="{{ url_for('questions.answer_skipped', question_id=next_question.id) }}">
+                    <button type="submit" class="btn btn-success mt-2">{{ _('Next Question ') }}</button>
+                </form>
+            {% else %}
+                <div class="alert alert-info mt-4">{{ _('No more skipped questions!') }}</div>
+            {% endif %}
+        {% elif feedback == 'incorrect' %}
+            <div class="alert alert-danger mt-4"> {{ _('Incorrect. Try again!') }}</div>
+        {% endif %}
+    {% endif %}
+
+    {% if show_answer %}
+        <div class="alert alert-info mt-4">
+            {{ _('The correct answer is:') }}<strong>{{ question.answer }}</strong>
+        </div>
+    {% endif %} 
+
+    <a href="{{ url_for('questions.view_skipped') }}" class="btn btn-secondary mt-4">{{ _('Back to Skipped  Questions') }}</a>
+</div>
+{% endblock %}

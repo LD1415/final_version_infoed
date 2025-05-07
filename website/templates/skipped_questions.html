@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Skipped Questions{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Skipped Questions</h2>
+
+    {% if grouped_skipped %}
+        <ul class="list-group">
+            {% set index = 0 %}
+        {% for date, questions in grouped_skipped.items() %}
+                <li class="list-group-item active font-weight-bold">{{ date }}</li>
+            {% for q in questions %}
+                    <!-- ans to skipped quest -->
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <form method="POST" action="{{ url_for('questions.answer_skipped', question_id=question.id) }}">
+                            {{ q.question }}</a>
+                    </li>
+                    {% set index = index + 1 %}
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No skipped questions.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %} {{ _(' Wrong Answers') }} {% endblock %}
+
+{% block content %}
+
+<style>
+    .question-container {
+        position: relative;
+        cursor: pointer;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom:15px;
+        transition: background-color 0.3s ease;
+    }
+
+    .question-container:hover {
+        background-color: #f1f1f1 ;
+    }
+    .details-box {
+        display: none;
+        margin-top: 10px;
+        background-color: #fff0f0;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 5px solid #dc3545;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .answer-block {
+        margin-bottom:10px;
+        padding: 10px;
+        background-color: #ffe6e6;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+</style>
+
+
+
+<div class="container mt-4">
+    <h2 class="mb-4">{{ _('Wrong Answers') }}</h2>
+
+    <form method="GET" action="{{ url_for('questions.wrong_answers') }}" class="mb-3">
+        <label for="sort_by">Sort by:</label>
+        <select name="sort_by" id="sort_by" onchange="this.form.submit()" class="form-control w-auto d-inline-block ml-2">
+            <option value="newest" {% if sort_by =='newest' %}selected{% endif %}>{{ _('Newest') }}</option>
+            <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>{{ _('Oldest') }}</option>
+        </select>
+    </form>
+
+    <div class="mb-4">
+        <input type="text" id="searchInput" onkeyup="filterQuestions()" placeholder="Search questions..." class="form-control">
+    </div>
+
+    {% if grouped_answers %}
+        {% for question, answers in grouped_answers.items() %}
+    <div class="question-container" onclick="toggleDetails('details-{{ loop.index }}')">
+        <strong>{{ question }}</strong>
+        <div id="details-{{ loop.index }}" class="details-box">
+            <p><strong>{{ _('Correct Answer: ') }}</strong> {{ answers[0].correct_answer }}</p>
+            <hr>
+            {% for answer in answers %}
+                <div class="answer-block">
+                    <p><strong>Your Answer: </strong> {{ answer.user_answer }}</p>
+                    <p class="text-muted"><small><strong>{{ _('Wrong on: ') }}</strong> {{ answer.timestamp.strftime('%Y-%m-%d %H:%M') }}</small></p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endfor %}
+    {% else %}
+        <p> {{ _('You have no wrong answers ') }}</p>
+    {% endif %}
+</div>
+
+
+
+<script>
+function toggleDetails(id) {
+        document.querySelectorAll('.details-box').forEach(box => {
+            if (box.id !==id) {
+                box.style.display= 'none';
+            }
+        });
+
+        const current = document.getElementById(id);
+        current.style.display = (current.style.display=== 'block') ? 'none' : 'block';
+    }
+
+    function filterQuestions() {
+        const input = document.getElementById("searchInput").value.toLowerCase();
+        const containers = document.querySelectorAll(".question-container");
+
+        containers.forEach(container => {
+            const questionText = container.getAttribute("data-question");
+            if (questionText.includes(input)) {
+                container.style.display = "block";
+            } else {
+                container.style.display ="none";
+            }
+        });
+    }
+</script>
+{% endblock %}
