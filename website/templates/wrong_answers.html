@@ -40,6 +40,65 @@
         from { opacity: 0; }
         to { opacity: 1; }
     }
+
+    .search-form {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .search-form input {
+        width: 250px;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+    }
+
+    .search-form input:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+    .search-form button {
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        margin-left: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .search-form button:hover {
+        background-color: #0056b3;
+    }
+
+    .search-form .clear-btn {
+        background-color: #dc3545;
+        margin-left: 5px;
+    }
+
+    .search-form .clear-btn:hover {
+        background-color: #c82333;
+    }
+
+    .input-group .form-control {
+    border-radius: 0.5rem 0 0 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.input-group .btn {
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.input-group .btn + .btn {
+    border-radius: 0.5rem;
+    margin-left: 5px;
+}
+
 </style>
 
 
@@ -48,28 +107,52 @@
     <h2 class="mb-4">{{ _('Wrong Answers') }}</h2>
 
     <form method="GET" action="{{ url_for('questions.wrong_answers') }}" class="mb-3">
-        <label for="sort_by">Sort by:</label>
+        <input type="hidden" id="timezone-input" name="timezone" value="">
+        <label for="sort_by">{{ _('Sort by:') }}</label>
         <select name="sort_by" id="sort_by" onchange="this.form.submit()" class="form-control w-auto d-inline-block ml-2">
             <option value="newest" {% if sort_by =='newest' %}selected{% endif %}>{{ _('Newest') }}</option>
             <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>{{ _('Oldest') }}</option>
         </select>
     </form>
 
-    <div class="mb-4">
-        <input type="text" id="searchInput" onkeyup="filterQuestions()" placeholder="Search questions..." class="form-control">
-    </div>
+    <form method="GET" action="{{ url_for('questions.wrong_answers') }}" class="mb-4">
+        <div class="input-group" style="max-width: 500px; margin: auto;">
+            <input 
+                type="text" 
+                name="search" 
+                class="form-control" 
+                placeholder="Search questions..." 
+                value="{{ request.args.get('search', '') }}"
+                aria-label="Search"
+            >
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">{{ _('Search') }}</button>
+                {% if request.args.get('search') %}
+                <a href="{{ url_for('questions.wrong_answers') }}" class="btn btn-outline-secondary">Clear</a>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+    
+    
 
     {% if grouped_answers %}
         {% for question, answers in grouped_answers.items() %}
-    <div class="question-container" onclick="toggleDetails('details-{{ loop.index }}')">
-        <strong>{{ question }}</strong>
+        <div class="question-container" data-question="{{ question | lower }}" onclick="toggleDetails('details-{{ loop.index }}')">
+            <strong>{{ question }}</strong>
         <div id="details-{{ loop.index }}" class="details-box">
             <p><strong>{{ _('Correct Answer: ') }}</strong> {{ answers[0].correct_answer }}</p>
             <hr>
             {% for answer in answers %}
                 <div class="answer-block">
                     <p><strong>Your Answer: </strong> {{ answer.user_answer }}</p>
-                    <p class="text-muted"><small><strong>{{ _('Wrong on: ') }}</strong> {{ answer.timestamp.strftime('%Y-%m-%d %H:%M') }}</small></p>
+                    <p class="text-muted">
+                        <small>
+                            <strong>{{ _('Wrong on: ') }}</strong>
+                            {{  answer.local_timestamp if answer.local_timestamp else _('Unknown') }}
+                        </small>
+                    </p>
+                    
                 </div>
             {% endfor %}
         </div>
@@ -79,7 +162,6 @@
         <p> {{ _('You have no wrong answers ') }}</p>
     {% endif %}
 </div>
-
 
 
 <script>
@@ -107,5 +189,24 @@ function toggleDetails(id) {
             }
         });
     }
+
+    function clearSearch() {
+        document.getElementById("searchInput").value = '';
+        filterQuestions(); 
+    }
 </script>
+
+<script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const url = new URL(window.location.href);
+
+        // Only add timezone if it's not already present
+        if (!url.searchParams.get("timezone")) {
+            url.searchParams.set("timezone", tz);
+            window.location.href = url.toString();  // redirect with timezone
+        }
+    });
+</script>
+
 {% endblock %}

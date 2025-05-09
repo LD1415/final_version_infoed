@@ -9,6 +9,7 @@ from collections import defaultdict
 from sympy import sympify, SympifyError, simplify
 from math import isclose
 from datetime import datetime
+from pytz import timezone as pytz_timezone, UnknownTimeZoneError
 
 def safe_eval(expr):
     try:
@@ -233,7 +234,7 @@ def answer_skipped(question_id):
             correct_answer = current_question.answer.strip()
             try:
             # bye bye space
-                user_expr = sympify(user_input.replace(" ", ""))
+                user_expr = sympify(user_answer.replace(" ", ""))
                 correct_expr = sympify(correct_answer.replace(" ", ""))
                 user_value = user_expr.evalf()
                 correct_value = correct_expr.evalf()
@@ -304,12 +305,29 @@ def answer_skipped_flow():
         session.pop('skipped_index', None)
         return render_template('answer_skipped.html', skipped=None)
 
+import pytz
+from datetime import datetime
+
+def adapt_timestamp_to_timezone(utc_dt, timezone_str):
+    # tz convert
+    if utc_dt.tzinfo is None:
+        utc_dt = pytz.utc.localize(utc_dt)
+
+    try:
+        user_tz = pytz.timezone(timezone_str)
+        local_dt = utc_dt.astimezone(user_tz)
+        return local_dt.strftime('%Y-%m-%d %H:%M')
+    except pytz.UnknownTimeZoneError:
+        return utc_dt.strftime('%Y-%m-%d %H:%M (UTC)')
 
 
 @questions_bp.route('/wrong-answers', methods=['GET'])
 @login_required
 def wrong_answers():
-    sort_by= request.args.get('sort_by', 'newest')
+    sort_by = request.args.get('sort_by', 'newest')
+    search_query = request.args.get('search', '').strip().lower()
+    user_timezone = request.args.get('timezone', 'UTC')
+
     base_query = WrongAnswer.query.filter(
         WrongAnswer.user_id == current_user.id,
         WrongAnswer.user_answer.isnot(None),
@@ -317,13 +335,146 @@ def wrong_answers():
     )
 
     if sort_by == 'oldest':
-        all_wrong_answers =base_query.order_by(WrongAnswer.timestamp.asc()).all()
+        all_wrong_answers = base_query.order_by(WrongAnswer.timestamp.asc()).all()
     else:
         all_wrong_answers = base_query.order_by(WrongAnswer.timestamp.desc()).all()
-    # grup rasp-intreb
+
+    if search_query:
+        all_wrong_answers = [
+            wa for wa in all_wrong_answers if search_query in wa.question.lower()
+        ]
+
+    #timestamps to tz
+    for wa in all_wrong_answers:
+        wa.local_timestamp = adapt_timestamp_to_timezone(wa.timestamp, user_timezone)
+
+
     grouped_answers = {}
     for wa in all_wrong_answers:
         if wa.question not in grouped_answers:
-            grouped_answers[wa.question] =[]
+            grouped_answers[wa.question] = []
         grouped_answers[wa.question].append(wa)
-    return render_template('wrong_answers.html', grouped_answers=grouped_answers, sort_by=sort_by)
+
+    return render_template('wrong_answers.html',
+                           grouped_answers=grouped_answers,
+                           sort_by=sort_by,
+                           user_timezone=user_timezone)
+
+
+
+@questions_bp.route('/rev-question', methods=['GET', 'POST'])
+@login_required
+def rev_question():
+    if 'questions' not in session:
+        session['questions'] = load_questions()
+        session['index'] = 0
+        session['start_time'] = datetime.utcnow().timestamp()
+
+    questions = session['questions']
+    index = session['index']
+    feedback = None
+    show_answer = False
+
+    if request.method == 'POST':
+        user_input = request.form.get('user_answer', '').strip()
+        correct_answer = request.form.get('correct_answer')
+        action = request.form.get('action')
+        card_id = request.form.get('card_id')
+
+        q_data = questions[index]
+
+        if action == 'view_skipped':
+            skipped_qs = SkippedQuestion.query.filter_by(user_id=current_user.id).order_by(SkippedQuestion.timestamp.desc()).all()
+            return render_template('full_rev.html', skipped_questions=skipped_qs, question=None)
+        elif action == 'skip':
+            exists = SkippedQuestion.query.filter_by(user_id=current_user.id, question=q_data['question']).first()
+            if not exists:
+                skipped = SkippedQuestion(
+                    user_id=current_user.id,
+                    question=q_data['question'],
+                    answer=q_data['answer']
+                )
+                db.session.add(skipped)
+                db.session.commit()
+
+            if card_id:
+                flashcard = Flashcard.query.get(int(card_id))
+                if flashcard:
+                    flashcard.priority += 1
+                    db.session.commit()
+            session['index'] += 1
+
+            if session['index'] < len(questions):
+                return render_template('full_rev.html', question=questions[session['index']], feedback=None, show_answer=False, skipped_questions=None)
+            else:
+                session.pop('questions', None)
+                session.pop('index', None)
+                return render_template('full_rev.html', question=None, feedback=None, show_answer=False, skipped_questions=None)
+
+        elif action == 'show_answer':
+            show_answer = True
+            if not feedback:
+                feedback = " "
+            return render_template('full_rev.html',  question=q_data, feedback= feedback,show_answer=show_answer,skipped_questions=None )
+        elif action == 'next':
+            session['index'] += 1
+            if session['index'] < len(questions):
+                return render_template('full_rev.html', question=questions[session['index']], feedback=None, show_answer=False, skipped_questions=None)
+            else:
+                session.pop('questions', None)
+                session.pop('index', None)
+                return render_template('full_rev.html', question=None, feedback=None, show_answer=False, skipped_questions=None)
+        elif action == 'submit':
+            try:
+            # bey bey space
+                user_expr = sympify(user_input.replace(" ", ""))
+                correct_expr = sympify(correct_answer.replace(" ", ""))
+                user_value = user_expr.evalf()
+                correct_value = correct_expr.evalf()
+                is_correct = isclose(float(user_value), float(correct_value), rel_tol=1e-9)
+            except (SympifyError, ValueError, TypeError):
+            # string cmp
+                is_correct = (user_input.replace(" ", "").lower() == correct_answer.replace(" ", "").lower())
+
+            if is_correct:
+                feedback = "Correct!"
+                if card_id:
+                    flashcard = Flashcard.query.get(int(card_id))
+                    if flashcard:
+                        flashcard.priority = max(0, flashcard.priority - 1)
+                        db.session.commit()
+                session['index'] += 1
+
+                if session['index'] < len(questions):
+                    return render_template('full_rev.html', question=questions[session['index']], feedback=feedback, show_answer=False, skipped_questions=None)
+                else:
+                    session.pop('questions', None)
+                    session.pop('index', None)
+                    return render_template('full_rev.html', question=None, feedback=feedback, show_answer=False, skipped_questions=None)
+
+            else:
+                feedback = "Incorrect."
+                # add incorrect try
+                wrong = WrongAnswer(
+                    user_id=current_user.id,
+                    question=q_data['question'],
+                    user_answer=user_input,
+                    correct_answer=correct_answer
+                )
+                db.session.add(wrong)
+                if card_id:
+                    flashcard = Flashcard.query.get(int(card_id))
+                    if flashcard:
+                        flashcard.priority += 2
+                        db.session.commit()
+                else:
+                    db.session.commit()
+                # stay on quest
+                return render_template('full_rev.html', question=q_data, feedback=feedback, show_answer=False, skipped_questions=None)
+
+    if index < len(questions):
+        return render_template('full_rev.html', question=questions[index], skipped_questions=None)
+    else:
+        session.pop('questions', None)
+        session.pop('index', None)
+        return render_template('full_rev.html', question=None, skipped_questions=None)

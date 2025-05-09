@@ -4,7 +4,7 @@ from . import db
 from .models import TimeSpent, Note
 import json
 import os
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, timezone
 import random
 from flask_babel import Babel, _
 from collections import defaultdict
@@ -60,6 +60,12 @@ def get_times_by_month(user_id, year):
 
 views = Blueprint('views', __name__)
 lang = Blueprint('lang', __name__)
+
+
+def get_adjusted_local_time(offset_minutes):
+    utc_now = datetime.utcnow().replace(tzinfo=timezone.utc)
+    adjusted = utc_now + timedelta(minutes=offset_minutes) + timedelta(hours=3)
+    return adjusted
 
 
 def save_time_spent():
@@ -264,3 +270,29 @@ def time_tracking_table():
                            times_by_month=times_by_month,
                            current_year=current_year)
 
+@views.route('/adjusted-save-time', methods=['POST'])
+@login_required
+def adjusted_save_time():
+    data = json.loads(request.data)
+    offset = data.get('timezoneOffset')
+
+    if offset is None:
+        return jsonify({'error': 'Missing timezoneOffset'}), 400
+
+    # tz dif
+    start_time = session.get('start_time')
+    if start_time:
+        time_spent = int(datetime.utcnow().timestamp() - start_time)
+        local_time = get_adjusted_local_time(offset)
+        today = local_time.date()
+
+        record = TimeSpent.query.filter_by(user_id=current_user.id, date=today).first()
+        if record:
+            record.time_spent_seconds += time_spent
+        else:
+            record = TimeSpent(user_id=current_user.id, date=today, time_spent_seconds=time_spent)
+            db.session.add(record)
+        db.session.commit()
+        session.pop('start_time', None)
+
+    return '', 204

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Flashcards</title>
+    <title>Revision Marathon</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -199,16 +199,17 @@
         }
 
 
-    </style>
+        </style>
+
 </head>
 <body>
     <div class="container">
-        <h1>{{ _('Flashcards Quiz') }}</h1>
+        <h1>{{ _('Revision Marathon') }}</h1>
 
         {% if question %}
             <p class="question-text">{{ question.question }}</p>
 
-            <form method="POST">
+            <form method="POST" action="{{ url_for('questions.rev_question') }}">
                 <input type="hidden" name="correct_answer" value="{{ question.answer }}">
                 <input type="hidden" name="card_id" value="{{ question.id }}">
                 <input type="text" name="user_answer" placeholder="Type your answer..." autofocus>
@@ -218,9 +219,7 @@
                     <button type="submit" name="action" value="submit" class="btn btn-info">{{ _('Submit Answer') }}</button>
                     <button type="submit" name="action" value="skip" class="btn btn-secondary">{{ _('Skip Question') }}</button>
                 </div>
-
                 {% endif %}
-                
             </form>
 
             {% if feedback %}
@@ -231,19 +230,18 @@
 
             {% if feedback and 'Correct' not in feedback %}
                 {% if show_answer %}
-                    <p class="answer">{{ _('Correct answer:') }} {{ question.answer }} </p>
-                    <form method="POST">
+                    <p class="answer">{{ _('Correct answer: ') }}{{ question.answer }} </p>
+                    <form method="POST" action="{{ url_for('questions.rev_question') }}">
                         <input type="hidden" name="correct_answer" value="{{ question.answer }}">
                         <input type="hidden" name="card_id" value="{{ question.id }}">
                         <button type="submit" name="action" value="next" class="btn btn-primary">{{ _('Next Question') }}</button>
                     </form>
                 {% else %}
-                <form method="POST">
-                    <input type="hidden" name="correct_answer" value="{{ question.answer }}">
-                    <input type="hidden" name="card_id" value="{{ question.id }}">
-                    <button type="submit" name="action" value="show_answer" class="btn btn-danger">{{ _('Show Correct Answer') }}</button>
-                </form>
-                
+                    <form method="POST" action="{{ url_for('questions.rev_question') }}">
+                        <input type="hidden" name="correct_answer" value="{{ question.answer }}">
+                        <input type="hidden" name="card_id" value="{{ question.id }}">
+                        <button type="submit" name="action" value="show_answer" class="btn btn-danger">{{ _('Show Correct Answer') }}</button>
+                    </form>
                 {% endif %}
             {% endif %}
         {% endif %}
@@ -251,7 +249,7 @@
         {% if grouped_skipped %}
         <div class="skipped-section">
             <h3>{{ _('Skipped Questions') }}</h3>
-        
+
             <div class="filter-container">
                 <label for="date-sort">{{ _('Sort by date: ') }}</label>
                 <select id="date-sort" onchange="sortDates(this.value)">
@@ -272,7 +270,6 @@
                 {% endfor %}
             </div>
         </div>
-        
         {% endif %}
 
         <button class="btn btn-secondary" onclick="location.href='/'">{{ _('Home ') }}</button>
@@ -297,6 +294,4 @@
         dateGroups.forEach(group => container.appendChild(group));
     }
 </script>
-
-
 </html>

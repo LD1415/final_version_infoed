@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}{{ -('Home') }}{% endblock %}
+{% block title %}{{ _('Home') }}{% endblock %}
 
 {% block content %}
 <h1 align="center">{{ _('Notes') }}</h1>
 
-<p align="center"><a href="{{ url_for('questions.questionnaire') }}" class="btn btn-info">Start Full revision</a></p>
+<p align="center"><a href="{{ url_for('questions.rev_question') }}" class="btn btn-info">Start Full revision</a></p>
 <!-- clasa -->
 <form method="POST" action="{{ url_for('questions.questionnaire') }}" align="center" style="margin-bottom: 20px;">
     <label for="grade"><strong>Select Grade:</strong></label>
@@ -85,6 +85,16 @@
 
     // 1st fetch
     fetchAndDisplayTime();
+
+    function sendAdjustedTime() {
+    const offset = new Date().getTimezoneOffset();  // user tz
+    // dif tz to server
+    navigator.sendBeacon('/adjusted-save-time', JSON.stringify({ timezoneOffset: offset }));
+    }
+
+    //inchide pg
+    window.addEventListener('beforeunload', sendAdjustedTime);
+
 
 </script>
 
