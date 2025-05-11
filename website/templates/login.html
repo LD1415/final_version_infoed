@@ -1,8 +1,83 @@
  
 {% extends "base.html" %} {% block title %}Login{% endblock %} {% block content
     %}
+
+    <style>
+      body {
+        background-color: #d7dee4;
+      }
+    
+      .login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px;
+  }
+
+  .login-box {
+    background-color: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+    padding: 100px 100px;
+    width: 100%;
+    max-width: 1500px;
+  }
+
+  .login-box h3 {
+    text-align: center;
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 60px;
+  }
+
+  .form-group label {
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .form-control {
+    border-radius: 16px;
+    padding: 24px;
+    font-size: 1.6rem;
+    margin-top: 10px;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 24px;
+    font-size: 1.8rem;
+    border-radius: 14px;
+    transition: all 0.2s ease-in-out;
+    margin-top: 40px;
+  }
+
+  .btn:hover {
+    transform: scale(1.03);
+    opacity: 0.95;
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 30px;
+    top: 68px;
+    cursor: pointer;
+    font-size: 1.4rem;
+    color: #007bff;
+  }
+
+  .form-group.password-group {
+    position: relative;
+    margin-top: 40px;
+  }
+    </style>
+    
+    <div class="login-wrapper">
+      <div class="login-box">
     <form method="POST">
-      <h3 align="center">Login</h3>
+      <h3>Login</h3>
       <div class="form-group">
         <label for="email">{{ _('Email Address') }}</label>
         <input
@@ -13,7 +88,7 @@
           placeholder="Enter email"
         />
       </div>
-      <div class="form-group">
+      <div class="form-group password-group">
         <label for="password">{{ _('Password') }}</label>
         <input
           type="password"
@@ -22,8 +97,24 @@
           name="password"
           placeholder="Enter password"
         />
+        <span class="password-toggle" onclick="togglePassword()">{{ _('see') }}</span>
       </div>
       <br />
       <button type="submit" class="btn btn-primary">Login</button>
     </form>
+
+    <script>
+      function togglePassword() {
+        const pwField = document.getElementById("password");
+        if (pwField.type === "password") {
+          pwField.type = "text";
+        } else {
+          pwField.type = "password";
+        }
+      }
+    
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("email").focus();
+      });
+    </script>
     {% endblock %}

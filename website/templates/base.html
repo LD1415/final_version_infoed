@@ -42,9 +42,6 @@
                     {% endif %}
                     <a class="nav-item nav-link" id="wrong" href="{{ url_for('questions.wrong_answers') }}"
                         >{{ _('Wrong Answers') }}
-                    </a>
-                    <a class="nav-item nav-link" id="trackTime" href="{{ url_for('views.time_tracking') }}">
-                        {{ _('Track Time') }}
                     </a>           
                 {% else %}
                     <a class="nav-item nav-link" id="login" href="{{ url_for('auth.login') }}"
@@ -59,7 +56,6 @@
             <div class="navbar-nav ml-auto">
                 <a class="nav-item nav-link" href="{{ url_for('lang.set_language', language='en') }}">English</a>
                 <a class="nav-item nav-link" href="{{ url_for('lang.set_language', language='ro') }}">Română</a>
-                <a class="nav-item nav-link" href="{{ url_for('lang.set_language', language='fr') }}">Français</a>
             </div>
             
         </div>

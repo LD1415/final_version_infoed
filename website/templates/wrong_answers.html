@@ -201,10 +201,9 @@ function toggleDetails(id) {
         const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const url = new URL(window.location.href);
 
-        // Only add timezone if it's not already present
         if (!url.searchParams.get("timezone")) {
             url.searchParams.set("timezone", tz);
-            window.location.href = url.toString();  // redirect with timezone
+            window.location.href = url.toString();  // schimba cu tz bun
         }
     });
 </script>

@@ -3,43 +3,158 @@
 {% block title %}{{ _('Answer Skipped Question ') }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-4">{{ _('Answer the Skipped Question') }}</h2>
+<style>
+    body {
+    background-color: #f8f9fa;
+}
 
-    <form method="POST">
-        <div class="form-group">
-            <label for="question">{{ question.question }}</label>
+.center-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px;
+}
+
+.card-box {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+    padding: 70px 80px;
+    width: 100%;
+    max-width: 1600px;
+    transition: box-shadow 0.3s ease;
+}
+
+.card-box:hover {
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-box h2 {
+    font-size: 2.4rem;
+    font-weight: 700;
+}
+
+.form-group label {
+    font-weight: 600;
+    font-size: 1.6rem;
+}
+
+.form-control {
+    border-radius: 12px;
+    padding: 18px;
+    font-size: 1.3rem;
+}
+
+.button-group {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 16px 32px;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    min-width: 220px;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: scale(1.04);
+    opacity: 0.95;
+}
+
+.alert {
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-top: 30px;
+}
+
+.back-btn {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.back-btn .btn {
+    min-width: 280px;
+    font-size: 1.15rem;
+    padding: 14px 28px;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+    .back-btn {
+        display: flex;
+        justify-content: center;
+        margin-top: 35px;
+    }
+
+    .back-btn .btn {
+        min-width: 250px;
+    }
+</style>
+
+
+<div class="container center-wrapper">
+    <div class="card-box fade-in">
+        <h2 class="mb-4 text-primary text-center">{{ _('Answer the  Question you've Skipped') }}</h2>
+
+        <form method="POST">
+            <div class="form-group">
+                <label for="question">{{ question.question }}</label>
             <input type="text" class="form-control" name="user_answer" required>
-        </div>
-        <button type="submit" class="btn btn-primary"> {{ _('Submit Answer') }}</button>
-    </form>
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary"> {{ _('Submit Answer') }}</button>
+        </form>
 
-    <form method="POST" class="mt-2">
-        <input type="hidden" name="show_answer" value="true">
-        <button type="submit" name="show_answer" class="btn btn-warning">{{ _('Show Correct Answer') }}</button>
-    </form>
+        <form method="POST">
+            <input type="hidden" name="show_answer" value="true">
+            <button type="submit" name="show_answer" class="btn btn-warning">{{ _('Show Correct Answer') }}</button>
+        </form>
+            </div>
 
-    {% if feedback %}
-        {% if feedback == 'correct' %}
-            <div class="alert alert-success mt-4">{{ _('Correct!') }}</div>
-            {% if next_question %}
-                <form method="GET" action="{{ url_for('questions.answer_skipped', question_id=next_question.id) }}">
+        {% if feedback %}
+            {% if feedback == 'correct' %}
+                <div class="alert alert-success fade-in">{{ _('Correct!') }}</div>
+                {% if next_question %}
+                    <form method="GET" action="{{ url_for('questions.answer_skipped', question_id=next_question.id) }}">
                     <button type="submit" class="btn btn-success mt-2">{{ _('Next Question ') }}</button>
-                </form>
-            {% else %}
-                <div class="alert alert-info mt-4">{{ _('No more skipped questions!') }}</div>
+                    </form>
+                {% else %}
+                        <div class="alert alert-info fade-in">{{ _('No more skipped questions!') }}</div>
+                {% endif %}
+            {% elif feedback == 'incorrect' %}
+            <div class="alert alert-danger fade-in"> {{ _('Incorrect. Try again!') }}</div>
             {% endif %}
-        {% elif feedback == 'incorrect' %}
-            <div class="alert alert-danger mt-4"> {{ _('Incorrect. Try again!') }}</div>
         {% endif %}
-    {% endif %}
 
-    {% if show_answer %}
-        <div class="alert alert-info mt-4">
-            {{ _('The correct answer is:') }}<strong>{{ question.answer }}</strong>
+        {% if show_answer %}
+            <div class="alert alert-info fade-in">
+                {{ _('The correct answer is:') }}<strong>{{ question.answer }}</strong>
+            </div>
+        {% endif %}
+
+        <div class="back-btn">
+            <a href="{{ url_for('questions.view_skipped') }}" class="btn btn-secondary">{{ _('Back to Skipped  Questions') }}</a>
         </div>
-    {% endif %} 
-
-    <a href="{{ url_for('questions.view_skipped') }}" class="btn btn-secondary mt-4">{{ _('Back to Skipped  Questions') }}</a>
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.querySelector('input[name="user_answer"]');
+        if (input) input.focus();
+    });
+</script>
 {% endblock %}

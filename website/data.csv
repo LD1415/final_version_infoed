@@ -6,12 +6,11 @@ What is the value of Pi to 2 decimal places?,3.14,9
 What is 12 squared?,144,9
 What is 5 factorial (5!)?,120,11
 What is the result of 2^5?,32,9
-What is the formula for the area of a circle?,πr²,10
-What is the Pythagorean theorem?,a² + b² = c²,10
-What is the derivative of x²?,2x,12
-What is the integral of 2x?,x² + C,12
+What is the formula for the area of a circle?,pi * r^2,10
+What is the Pythagorean theorem?,a^2 + b^2 = c^2,10
+What is the derivative of x²?,2 * x,12
+What is the integral of 2x?,x^2 + C,12
 What is the slope formula?,(y2 - y1)/(x2 - x1),10
-What is the quadratic formula?,(-b±√(b²-4ac))/(2a),11
 What is 10 percent of 250?,25,9
 Convert 0.75 to a fraction,3/4,9
 What is the mean of 3 6 9 12?,7.5,9
@@ -29,38 +28,19 @@ What is the integral of 1/x?,ln|x| + C,12
 What is the limit of 1/x as x approaches infinity?,0,11
 What is the second derivative of x³?,6x,12
 What does the Fundamental Theorem of Calculus connect?,Derivatives and integrals,12
-What is the formula for the area of a triangle?,(base × height)/2,9
-What is the Pythagorean Theorem?,a² + b² = c²,9
-What is the formula for the perimeter of a rectangle?,2 × (length + width),9
-What is the slope formula?,(y₂ - y₁)/(x₂ - x₁),9
-What is the area of a circle?,π × r²,9
-What is the circumference of a circle?,2 × π × r,9
+What is the formula for the area of a triangle?,(b * h)/2,9
+What is the Pythagorean Theorem?,a^2 + b^2 = c^2,9
+What is the formula for the perimeter of a rectangle?,2 * (l + w),9
+What is the slope formula?,(y2 - y1)/(x2 - x1),9
+What is the area of a circle?,pi * r^2,9
+What is the circumference of a circle?,2 * pi * r,9
 What is the volume of a cube?,side³,9
-What is the quadratic formula?,(-b ± √(b² - 4ac)) / 2a,9
+What is the quadratic formula?,(-b ± sqrt(b^2 - 4ac)) / 2a,9
 What is the distributive property?,a(b + c) = ab + ac,9
 What is the associative property of addition?,(a + b) + c = a + (b + c),9
-What is the commutative property of multiplication?,a × b = b × a,9
+What is the commutative property of multiplication?,a * b = b * a,9
 What is the equation of a line in slope-intercept form?,y = mx + b,9
-How do you convert a fraction to a decimal?,Divide numerator by denominator,9
-What is the formula for the volume of a cylinder?,π × r² × h,9
-How do you solve a linear equation?,Isolate the variable,9
-What is a rational number?,A number that can be expressed as a ratio,9
-What is the definition of a function?,A relation where each input has one output,9
-What is the least common multiple?,The smallest number divisible by two numbers,9
-What is the greatest common divisor?,The largest number dividing two numbers evenly,9
-What is a prime number?,A number with exactly two distinct divisors,9
-What is the formula for distance between two points?,√((x₂ - x₁)² + (y₂ - y₁)²),9
-What is a linear equation?,An equation whose graph is a straight line,9
-What does “solve for x” mean?,Find the value(s) of x that make the equation true,9
-What is absolute value?,Distance from zero on a number line,9
-How do you simplify an expression?,Combine like terms,9
-What is a proportion?,An equation stating two ratios are equal,9
-How do you find percent of a number?,(part/whole) × 100,9
-What is an exponent?,A number showing how many times to multiply the base,9
-What is scientific notation?,A way to express very large or small numbers,9
-What is a monomial?,An algebraic expression with one term,9
-What is a polynomial?,An expression with multiple terms,9
-What is factoring?,Writing a number or expression as a product,9
-What is the opposite of squaring?,Taking the square root,9
-What is the coordinate plane?,A plane with x and y axes,9
+What is the formula for the volume of a cylinder?,pi * r^2 * h,9
+What is the formula for distance between two points?,sqrt((x2 - x1)^2 + (y2 - y1)^2),9
+
 

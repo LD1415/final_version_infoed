@@ -102,6 +102,8 @@ def home():
     
     today = date.today()
     record = TimeSpent.query.filter_by(user_id=current_user.id, date=today).first()
+    minutes_spent_today = record.time_spent_seconds // 60 if record else 0
+
     if record:
         minutes_spent_today = record.time_spent_seconds // 60
     else:
@@ -109,9 +111,20 @@ def home():
 
     # tot notes 2 view
     user_notes = Note.query.filter_by(user_id=current_user.id).all()
+############
+    current_year = today.year
+    all_months = get_all_days_in_year(current_year)
+    times_by_month = get_times_by_month(current_user.id, current_year)
 
-    return render_template("home.html", user=current_user, notes=user_notes)
-
+    return render_template(
+        "home.html",
+        user=current_user,
+        notes=user_notes,
+        minutes_spent_today=minutes_spent_today,
+        all_months=all_months,
+        times_by_month=times_by_month,
+        current_year=current_year
+    )
 
 @views.route('/delete-note', methods=['POST'])
 def delete_note():
@@ -202,7 +215,7 @@ def time_tracking():
                            all_months=all_months)
 
 
-
+##################
 @views.route('/day/<date>')
 @login_required
 def view_day(date):
