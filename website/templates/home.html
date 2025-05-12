@@ -236,8 +236,11 @@
         {% for note in user.notes %}
             <li class="list-group-item" id="note-{{ note.id }}">
                 <p>{{ note.data }}</p>
-                <small class="text-muted">{{ t('Created at:') }} {{ note.date.strftime('%Y-%m-%d %H:%M:%S') }}</small>
-                <button type="button" class="close" onclick="deleteNote({{ note.id }})">
+                <small class="text-muted">
+                    {{ t('Created on:') }}
+                    <span class="note-date" data-utc="{{ note.date.isoformat() }}Z"></span>
+                </small>
+                    <button type="button" class="close" onclick="deleteNote({{ note.id }})">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </li>
@@ -254,6 +257,7 @@
 </div>
 
 <script>
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     function deleteNote(noteId) {
         if (confirm('Are you sure you want to delete this note?')) {
             fetch('/delete-note', {
@@ -261,16 +265,16 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ noteId: noteId }),
             })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    document.querySelector(`#note-${noteId}`).remove();
+                    document.getElementById(`note-${noteId}`).remove();
                 } else {
                     alert('Error deleting the note!');
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
+            .catch(err => {
+                console.error('Error:', err);
                 alert('Error deleting the note!');
             });
         }
@@ -280,15 +284,14 @@
         fetch('/show-time-json')
             .then(response => response.json())
             .then(data => {
-                document.getElementById('time-spent-message').textContent =
-                    `${data.minutes} {{ t('minutes spent on site today') }}`;
+                const el = document.getElementById('time-spent-message');
+                if (el) el.textContent = `${data.minutes} {{ t('minutes spent on site today') }}`;
             });
     }
 
     setInterval(() => {
         fetch('/update-time', { method: 'POST' }).then(fetchAndDisplayTime);
-    }, 10000);
-
+    }, 60000);
     fetchAndDisplayTime();
 
     function sendAdjustedTime() {
@@ -297,5 +300,20 @@
     }
 
     window.addEventListener('beforeunload', sendAdjustedTime);
+
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll('.note-date').forEach(el => {
+            const utc = el.dataset.utc;
+            if (!utc) return;
+            const local = new Date(utc);
+            const fmt = new Intl.DateTimeFormat(undefined, {
+                year: 'numeric', month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit',
+                timeZone: tz, hour12: false
+            });
+            el.textContent = fmt.format(local);
+        });
+    });
 </script>
+
 {% endblock %}

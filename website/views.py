@@ -105,14 +105,8 @@ def home():
     record = TimeSpent.query.filter_by(user_id=current_user.id, date=today).first()
     minutes_spent_today = record.time_spent_seconds // 60 if record else 0
 
-    if record:
-        minutes_spent_today = record.time_spent_seconds // 60
-    else:
-        minutes_spent_today = 0
-
     # tot notes 2 view
     user_notes = Note.query.filter_by(user_id=current_user.id).all()
-############
     current_year = today.year
     all_months = get_all_days_in_year(current_year)
     times_by_month = get_times_by_month(current_user.id, current_year)
@@ -142,54 +136,10 @@ def delete_note():
 
 @views.route('/set_lang/<lang>')
 def set_lang(lang):
+    print(f"Changing language to {lang}")  #arata pt debug
     session['lang'] = lang
+    print(f"Session after change: {session['lang']}")
     return redirect(request.referrer or url_for('views.home'))
-
-
-
-
-@views.route('/time-tracking')
-@login_required
-def time_tracking():
-    times = TimeSpent.query.filter_by(user_id=current_user.id).all()
-    # timp/iz
-    times_by_day = defaultdict(int)  #{date:total_seconds}
-    for record in times:
-        times_by_day[record.date] += record.time_spent_seconds
-    # org timp zi, luna
-    times_by_month = defaultdict(lambda: defaultdict(int))  #{month:{day:total_seconds}}
-    for day_date, total_seconds in times_by_day.items():
-        times_by_month[day_date.month][day_date.day] = total_seconds
-    # arata date
-    current_year = date.today().year
-    all_months = {month: [] for month in range(1, 13)}
-
-    for month in all_months.keys():
-        start_date = date(current_year, month, 1)
-        while start_date.month == month:
-            all_months[month].append(start_date)
-            start_date += timedelta(days=1)
-
-    return render_template('track_time.html',
-                           current_year=current_year,
-                           current_date=date.today(),
-                           times_by_month=times_by_month,
-                           all_months=all_months)
-
-
-##################
-@views.route('/day/<date>')
-@login_required
-def view_day(date):
-    record = TimeSpent.query.filter_by(user_id=current_user.id, date=date).first()
-    if not record:
-        flash(_('No data for this date.'), 'danger')
-        return redirect(url_for('views.time_tracking'))
-    
-    minutes = record.time_spent_seconds // 60
-    seconds = record.time_spent_seconds % 60
-
-    return render_template('day_detail.html', date=date, minutes=minutes, seconds=seconds)
 
 
 @views.route('/update-time', methods=['POST'])
@@ -204,16 +154,6 @@ def update_time():
     db.session.commit()
     return '', 204
 
-@views.route('/show-time')
-@login_required
-def show_time():
-    today = date.today()
-    record = TimeSpent.query.filter_by(user_id=current_user.id, date=today).first()
-    if record:
-        minutes = record.time_spent_seconds//60
-    else:
-        minutes = 0
-    return render_template('show_time.html', minutes=minutes)
 
 @views.route('/show-time-json')
 @login_required
@@ -222,28 +162,6 @@ def show_time_json():
     record = TimeSpent.query.filter_by(user_id=current_user.id, date=today).first()
     minutes = record.time_spent_seconds //60 if record else 0
     return jsonify(minutes=minutes)
-
-
-@views.route('/time-tracking-table')
-@login_required
-def time_tracking_table():
-    today = date.today()
-    current_year = today.year
-    all_months = get_all_days_in_year(current_year)
-    times_by_month = get_times_by_month(current_user.id, current_year)
-# timp tot
-    total_time_sec = sum(
-        time for month_times in times_by_month.values()
-        for time in month_times.values()
-    )
-    total_minutes = total_time_sec // 60
-
-    print(f"[{datetime.now()}] User {current_user.id} total time: {total_time_sec} sec ({total_minutes} min)")
-
-    return render_template('track_time.html',
-                           all_months=all_months,
-                           times_by_month=times_by_month,
-                           current_year=current_year)
 
 @views.route('/adjusted-save-time', methods=['POST'])
 @login_required
@@ -271,11 +189,3 @@ def adjusted_save_time():
         session.pop('start_time', None)
 
     return '', 204
-
-
-@views.route('/test-translation', methods=['GET'])
-def test_translation():
-    lang = request.args.get('lang')
-    if lang in ['en', 'ro']:
-        session['lang'] = lang
-    return render_template('test_translation.html')
