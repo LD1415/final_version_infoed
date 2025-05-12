@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ _('Home') }}{% endblock %}
+{% block title %}{{ t('Home') }}{% endblock %}
 
 {% block content %}
 <style>
@@ -169,32 +169,32 @@
     <div class="left-panel">
         <p align="center">
             <a href="{{ url_for('questions.rev_question') }}" class="btn btn-info" style="font-size: 18px; padding: 15px 30px;">
-                {{ _('Start Full Revision') }}
+                {{ t('Start Full Revision') }}
             </a>
         </p>
 
         <form method="POST" action="{{ url_for('questions.questionnaire') }}" class="form-inline">
-            <label for="grade"><strong>{{ _('Select Grade:') }}</strong></label>
+            <label for="grade"><strong>{{ t('Select Grade:') }}</strong></label>
             <select name="grade" id="grade" class="form-control">
-                <option value="9">{{ _('Grade') }} 9</option>
-                <option value="10">{{ _('Grade') }} 10</option>
-                <option value="11">{{ _('Grade') }} 11</option>
-                <option value="12">{{ _('Grade') }} 12</option>
+                <option value="9">{{ t('Grade') }} 9</option>
+                <option value="10">{{ t('Grade') }} 10</option>
+                <option value="11">{{ t('Grade') }} 11</option>
+                <option value="12">{{ t('Grade') }} 12</option>
             </select>
             <button type="submit" class="btn btn-primary" style="padding: 10px 18px; font-size: 15px;">
-                {{ _('Start Flashcards Quiz') }}
+                {{ t('Start Flashcards Quiz') }}
             </button>
         </form>
 
         {% if minutes_spent_today is not none %}
             <p id="time-spent-message">
-                {{ minutes_spent_today }} {{ _('minutes spent on site today') }}
+                {{ minutes_spent_today }} 
             </p>
         {% endif %}
     </div>
 
     <div class="right-panel">
-        <h2>{{ _('Time Tracking for') }} {{ current_year }}</h2>
+        <h2>{{ t('Time Tracking for') }} {{ current_year }}</h2>
         <table>
             <tbody>
                 {% for month, days in all_months.items() %}
@@ -231,12 +231,12 @@
 </div>
 
 <div class="notes-section">
-    <h2 align="center">{{ _('Notes') }}</h2>
+    <h2 align="center">{{ t('Notes') }}</h2>
     <ul class="list-group list-group-flush" id="notes">
         {% for note in user.notes %}
             <li class="list-group-item" id="note-{{ note.id }}">
                 <p>{{ note.data }}</p>
-                <small class="text-muted">{{ _('Created at:') }} {{ note.date.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                <small class="text-muted">{{ t('Created at:') }} {{ note.date.strftime('%Y-%m-%d %H:%M:%S') }}</small>
                 <button type="button" class="close" onclick="deleteNote({{ note.id }})">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -248,7 +248,7 @@
         <textarea name="note" id="note" class="form-control"></textarea>
         <br />
         <div align="center">
-            <button type="submit" class="btn btn-primary">{{ _('Add Note') }}</button>
+            <button type="submit" class="btn btn-primary">{{ t('Add Note') }}</button>
         </div>
     </form>
 </div>
@@ -281,7 +281,7 @@
             .then(response => response.json())
             .then(data => {
                 document.getElementById('time-spent-message').textContent =
-                    `${data.minutes} minutes spent on site today`;
+                    `${data.minutes} {{ t('minutes spent on site today') }}`;
             });
     }
 

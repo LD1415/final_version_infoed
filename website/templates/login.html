@@ -1,6 +1,8 @@
  
-{% extends "base.html" %} {% block title %}Login{% endblock %} {% block content
-    %}
+{% extends "base.html" %} {% block title %}Login{% endblock %} 
+
+
+{% block content %}
 
     <style>
       body {
@@ -77,9 +79,9 @@
     <div class="login-wrapper">
       <div class="login-box">
     <form method="POST">
-      <h3>Login</h3>
+      <h3>{{ t('Login') }}</h3>
       <div class="form-group">
-        <label for="email">{{ _('Email Address') }}</label>
+        <label for="email">{{ t('Email Address') }}</label>
         <input
           type="email"
           class="form-control"
@@ -89,7 +91,7 @@
         />
       </div>
       <div class="form-group password-group">
-        <label for="password">{{ _('Password') }}</label>
+        <label for="password">{{ t('Password') }}</label>
         <input
           type="password"
           class="form-control"
@@ -97,10 +99,10 @@
           name="password"
           placeholder="Enter password"
         />
-        <span class="password-toggle" onclick="togglePassword()">{{ _('see') }}</span>
+        <span class="password-toggle" onclick="togglePassword()">{{ t('see') }}</span>
       </div>
       <br />
-      <button type="submit" class="btn btn-primary">Login</button>
+      <button type="submit" class="btn btn-primary">{{ t('Login') }}</button>
     </form>
 
     <script>

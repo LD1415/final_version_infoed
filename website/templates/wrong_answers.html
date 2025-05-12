@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %} {{ _(' Wrong Answers') }} {% endblock %}
+{% block title %} {{ t('Wrong Answers') }} {% endblock %}
+
 
 {% block content %}
 
@@ -104,14 +105,14 @@
 
 
 <div class="container mt-4">
-    <h2 class="mb-4">{{ _('Wrong Answers') }}</h2>
+    <h2 class="mb-4">{{ t('Wrong Answers') }}</h2>
 
     <form method="GET" action="{{ url_for('questions.wrong_answers') }}" class="mb-3">
         <input type="hidden" id="timezone-input" name="timezone" value="">
-        <label for="sort_by">{{ _('Sort by:') }}</label>
+        <label for="sort_by">{{ t('Sort by:') }}</label>
         <select name="sort_by" id="sort_by" onchange="this.form.submit()" class="form-control w-auto d-inline-block ml-2">
-            <option value="newest" {% if sort_by =='newest' %}selected{% endif %}>{{ _('Newest') }}</option>
-            <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>{{ _('Oldest') }}</option>
+            <option value="newest" {% if sort_by =='newest' %}selected{% endif %}>{{ t('Newest') }}</option>
+            <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>{{ t('Oldest') }}</option>
         </select>
     </form>
 
@@ -126,7 +127,7 @@
                 aria-label="Search"
             >
             <div class="input-group-append">
-                <button class="btn btn-primary" type="submit">{{ _('Search') }}</button>
+                <button class="btn btn-primary" type="submit">{{ t('Search') }}</button>
                 {% if request.args.get('search') %}
                 <a href="{{ url_for('questions.wrong_answers') }}" class="btn btn-outline-secondary">Clear</a>
                 {% endif %}
@@ -141,15 +142,15 @@
         <div class="question-container" data-question="{{ question | lower }}" onclick="toggleDetails('details-{{ loop.index }}')">
             <strong>{{ question }}</strong>
         <div id="details-{{ loop.index }}" class="details-box">
-            <p><strong>{{ _('Correct Answer: ') }}</strong> {{ answers[0].correct_answer }}</p>
+            <p><strong>{{ t('Correct Answer') }}: </strong> {{ answers[0].correct_answer }}</p>
             <hr>
             {% for answer in answers %}
                 <div class="answer-block">
-                    <p><strong>Your Answer: </strong> {{ answer.user_answer }}</p>
+                    <p><strong>{{ t('Your Answer') }}: </strong> {{ answer.user_answer }}</p>
                     <p class="text-muted">
                         <small>
-                            <strong>{{ _('Wrong on: ') }}</strong>
-                            {{  answer.local_timestamp if answer.local_timestamp else _('Unknown') }}
+                            <strong>{{ t('Wrong on') }}: </strong>
+                            {{  answer.local_timestamp if answer.local_timestamp else t('Unknown') }}
                         </small>
                     </p>
                     
@@ -159,7 +160,7 @@
     </div>
 {% endfor %}
     {% else %}
-        <p> {{ _('You have no wrong answers ') }}</p>
+        <p> {{ t('You have no wrong answers') }} </p>
     {% endif %}
 </div>
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-04-23 23:46+0300\n"
+"POT-Creation-Date: 2025-05-12 08:30+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -312,35 +312,209 @@ msgid_plural "{len_type} values are required, but {len_value} were given."
 msgstr[0] ""
 msgstr[1] ""
 
-#: website/templates/base.html:2
+#: website/views.py:97
+msgid "Note is too short!"
+msgstr ""
+
+#: website/views.py:102
+msgid "Note added!"
+msgstr ""
+
+#: website/views.py:190
+msgid "No data for this date."
+msgstr ""
+
+#: website/templates/base.html:3
 msgid "en"
 msgstr ""
 
-#: website/templates/base.html:19 website/templates/base.html:35
+#: website/templates/base.html:20 website/templates/base.html:36
+#: website/templates/home.html:2
 msgid "Home"
 msgstr ""
 
-#: website/templates/base.html:38
+#: website/templates/base.html:39
 msgid "Logout"
 msgstr ""
 
-#: website/templates/base.html:42
+#: website/templates/base.html:42 website/templates/flashcards.html:263
+#: website/templates/full_rev.html:251
+#: website/templates/skipped_questions.html:3
+#: website/templates/skipped_questions.html:8
+msgid "Skipped Questions"
+msgstr ""
+
+#: website/templates/base.html:45 website/templates/wrong_answers.html:3
+#: website/templates/wrong_answers.html:108
+msgid "Wrong Answers"
+msgstr ""
+
+#: website/templates/base.html:49
 msgid "Login"
 msgstr ""
 
-#: website/templates/home.html:5 website/templates/test_translation.html:8
+#: website/templates/flashcards.html:3
+msgid "flashcards "
+msgstr ""
+
+#: website/templates/flashcards.html:216
+msgid "Flashcards Quiz"
+msgstr ""
+
+#: website/templates/flashcards.html:228 website/templates/full_rev.html:219
+msgid "Submit Answer"
+msgstr ""
+
+#: website/templates/flashcards.html:229 website/templates/full_rev.html:220
+msgid "Skip Question"
+msgstr ""
+
+#: website/templates/flashcards.html:244
+msgid "Correct answer:"
+msgstr ""
+
+#: website/templates/flashcards.html:248 website/templates/full_rev.html:237
+msgid "Next Question"
+msgstr ""
+
+#: website/templates/flashcards.html:254 website/templates/full_rev.html:243
+msgid "Show Correct Answer"
+msgstr ""
+
+#: website/templates/flashcards.html:266 website/templates/full_rev.html:254
+msgid "Sort by date: "
+msgstr ""
+
+#: website/templates/flashcards.html:268 website/templates/full_rev.html:256
+msgid "Newest First"
+msgstr ""
+
+#: website/templates/flashcards.html:269 website/templates/full_rev.html:257
+msgid "Oldest First"
+msgstr ""
+
+#: website/templates/flashcards.html:288 website/templates/full_rev.html:275
+msgid "Home "
+msgstr ""
+
+#: website/templates/full_rev.html:5 website/templates/full_rev.html:207
+msgid "Revision Marathon"
+msgstr ""
+
+#: website/templates/full_rev.html:233
+msgid "Correct answer: "
+msgstr ""
+
+#: website/templates/home.html:172
+msgid "Start Full Revision"
+msgstr ""
+
+#: website/templates/home.html:177
+msgid "Select Grade:"
+msgstr ""
+
+#: website/templates/home.html:179 website/templates/home.html:180
+#: website/templates/home.html:181 website/templates/home.html:182
+msgid "Grade"
+msgstr ""
+
+#: website/templates/home.html:185
+msgid "Start Flashcards Quiz"
+msgstr ""
+
+#: website/templates/home.html:191
+msgid "minutes spent on site today"
+msgstr ""
+
+#: website/templates/home.html:197
+msgid "Time Tracking for"
+msgstr ""
+
+#: website/templates/home.html:234
 msgid "Notes"
 msgstr ""
 
-#: website/templates/home.html:27 website/templates/test_translation.html:9
+#: website/templates/home.html:239
+msgid "Created at:"
+msgstr ""
+
+#: website/templates/home.html:251
 msgid "Add Note"
 msgstr ""
 
-#: website/templates/test_translation.html:5
-msgid "Test Translation"
+#: website/templates/sign_up.html:2
+msgid "Sign Up "
 msgstr ""
 
-#: website/templates/test_translation.html:15
-msgid "Switch to Romanian"
+#: website/templates/sign_up.html:6
+msgid "Sign Up"
+msgstr ""
+
+#: website/templates/sign_up.html:8
+msgid "Email Address"
+msgstr ""
+
+#: website/templates/sign_up.html:18
+msgid "First Name"
+msgstr ""
+
+#: website/templates/sign_up.html:28
+msgid "Last Name"
+msgstr ""
+
+#: website/templates/sign_up.html:38
+msgid "Password"
+msgstr ""
+
+#: website/templates/sign_up.html:48
+msgid "Password "
+msgstr ""
+
+#: website/templates/sign_up.html:48
+msgid "(Confirm)"
+msgstr ""
+
+#: website/templates/sign_up.html:58
+msgid "Submit"
+msgstr ""
+
+#: website/templates/skipped_questions.html:26
+msgid "No skipped questions"
+msgstr ""
+
+#: website/templates/wrong_answers.html:112
+msgid "Sort by:"
+msgstr ""
+
+#: website/templates/wrong_answers.html:114
+msgid "Newest"
+msgstr ""
+
+#: website/templates/wrong_answers.html:115
+msgid "Oldest"
+msgstr ""
+
+#: website/templates/wrong_answers.html:130
+msgid "Search"
+msgstr ""
+
+#: website/templates/wrong_answers.html:145
+msgid "Correct Answer"
+msgstr ""
+
+#: website/templates/wrong_answers.html:149
+msgid "Your Answer"
+msgstr ""
+
+#: website/templates/wrong_answers.html:152
+msgid "Wrong on"
+msgstr ""
+
+#: website/templates/wrong_answers.html:153
+msgid "Unknown"
+msgstr ""
+
+#: website/templates/wrong_answers.html:163
+msgid "You have no wrong answers"
 msgstr ""
 

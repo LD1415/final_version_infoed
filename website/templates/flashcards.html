@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('flashcards ') }}{% endblock %}
+{% block title %}{{ t('flashcards ') }}{% endblock %}
 
 {% block content %}
     <style>
@@ -213,7 +213,7 @@
     </style>
 <div class="container center-wrapper">
     <div class="card-box fade-in">
-            <h1 class="mb-4 text-primary text-center">{{ _('Flashcards Quiz') }}</h1>
+            <h1 class="mb-4 text-primary text-center">{{ t('Flashcards Quiz') }}</h1>
 
         {% if question %}
             <p class="question-text">{{ question.question }}</p>
@@ -225,8 +225,8 @@
                 
                 {% if not show_answer %}
                 <div>
-                    <button type="submit" name="action" value="submit" class="btn btn-info">{{ _('Submit Answer') }}</button>
-                    <button type="submit" name="action" value="skip" class="btn btn-secondary">{{ _('Skip Question') }}</button>
+                    <button type="submit" name="action" value="submit" class="btn btn-info">{{ t('Submit Answer') }}</button>
+                    <button type="submit" name="action" value="skip" class="btn btn-secondary">{{ t('Skip Question') }}</button>
                 </div>
 
                 {% endif %}
@@ -241,17 +241,17 @@
 
             {% if feedback and 'Correct' not in feedback %}
                 {% if show_answer %}
-                    <p class="answer">{{ _('Correct answer:') }} {{ question.answer }} </p>
+                    <p class="answer">{{ t('Correct answer:') }} {{ question.answer }} </p>
                     <form method="POST">
                         <input type="hidden" name="correct_answer" value="{{ question.answer }}">
                         <input type="hidden" name="card_id" value="{{ question.id }}">
-                        <button type="submit" name="action" value="next" class="btn btn-primary">{{ _('Next Question') }}</button>
+                        <button type="submit" name="action" value="next" class="btn btn-primary">{{ t('Next Question') }}</button>
                     </form>
                 {% else %}
                 <form method="POST">
                     <input type="hidden" name="correct_answer" value="{{ question.answer }}">
                     <input type="hidden" name="card_id" value="{{ question.id }}">
-                    <button type="submit" name="action" value="show_answer" class="btn btn-danger">{{ _('Show Correct Answer') }}</button>
+                    <button type="submit" name="action" value="show_answer" class="btn btn-danger">{{ t('Show Correct Answer') }}</button>
                 </form>
                 
                 {% endif %}
@@ -260,13 +260,13 @@
 
         {% if grouped_skipped %}
         <div class="skipped-section">
-            <h3>{{ _('Skipped Questions') }}</h3>
+            <h3>{{ t('Skipped Questions') }}</h3>
         
             <div class="filter-container">
-                <label for="date-sort">{{ _('Sort by date: ') }}</label>
+                <label for="date-sort">{{ t('Sort by date: ') }}</label>
                 <select id="date-sort" onchange="sortDates(this.value)">
-                    <option value="desc" selected> {{ _('Newest First') }}</option>
-                    <option value="asc">{{ _('Oldest First') }}</option>
+                    <option value="desc" selected> {{ t('Newest First') }}</option>
+                    <option value="asc">{{ t('Oldest First') }}</option>
                 </select>
             </div>
             <div id="skipped-dates-container">
@@ -285,7 +285,7 @@
         
         {% endif %}
 
-        <button class="btn btn-secondary" onclick="location.href='/'">{{ _('Home ') }}</button>
+        <button class="btn btn-secondary" onclick="location.href='/'">{{ t('Home ') }}</button>
     </div>
 </div> 
 <script>

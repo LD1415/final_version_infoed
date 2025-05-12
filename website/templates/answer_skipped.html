@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Answer Skipped Question ') }}{% endblock %}
+{% block title %}{{ t('Answer Skipped Question ') }}{% endblock %}
+
 
 {% block content %}
 <style>
@@ -107,7 +108,7 @@
 
 <div class="container center-wrapper">
     <div class="card-box fade-in">
-        <h2 class="mb-4 text-primary text-center">{{ _('Answer the  Question you've Skipped') }}</h2>
+        <h2 class="mb-4 text-primary text-center">{{ t('Answer the  Question you've Skipped') }}</h2>
 
         <form method="POST">
             <div class="form-group">
@@ -115,38 +116,38 @@
             <input type="text" class="form-control" name="user_answer" required>
             </div>
             <div class="button-group">
-                <button type="submit" class="btn btn-primary"> {{ _('Submit Answer') }}</button>
+                <button type="submit" class="btn btn-primary"> {{ t('Submit Answer') }}</button>
         </form>
 
         <form method="POST">
             <input type="hidden" name="show_answer" value="true">
-            <button type="submit" name="show_answer" class="btn btn-warning">{{ _('Show Correct Answer') }}</button>
+            <button type="submit" name="show_answer" class="btn btn-warning">{{ t('Show Correct Answer') }}</button>
         </form>
             </div>
 
         {% if feedback %}
             {% if feedback == 'correct' %}
-                <div class="alert alert-success fade-in">{{ _('Correct!') }}</div>
+                <div class="alert alert-success fade-in">{{ t('Correct!') }}</div>
                 {% if next_question %}
                     <form method="GET" action="{{ url_for('questions.answer_skipped', question_id=next_question.id) }}">
-                    <button type="submit" class="btn btn-success mt-2">{{ _('Next Question ') }}</button>
+                    <button type="submit" class="btn btn-success mt-2">{{ t('Next Question ') }}</button>
                     </form>
                 {% else %}
-                        <div class="alert alert-info fade-in">{{ _('No more skipped questions!') }}</div>
+                        <div class="alert alert-info fade-in">{{ t('No more skipped questions!') }}</div>
                 {% endif %}
             {% elif feedback == 'incorrect' %}
-            <div class="alert alert-danger fade-in"> {{ _('Incorrect. Try again!') }}</div>
+            <div class="alert alert-danger fade-in"> {{ t('Incorrect. Try again!') }}</div>
             {% endif %}
         {% endif %}
 
         {% if show_answer %}
             <div class="alert alert-info fade-in">
-                {{ _('The correct answer is:') }}<strong>{{ question.answer }}</strong>
+                {{ t('The correct answer is:') }}<strong>{{ question.answer }}</strong>
             </div>
         {% endif %}
 
         <div class="back-btn">
-            <a href="{{ url_for('questions.view_skipped') }}" class="btn btn-secondary">{{ _('Back to Skipped  Questions') }}</a>
+            <a href="{{ url_for('questions.view_skipped') }}" class="btn btn-secondary">{{ t('Back to Skipped  Questions') }}</a>
         </div>
     </div>
 </div>

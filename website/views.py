@@ -10,6 +10,7 @@ from flask_babel import Babel, _
 from collections import defaultdict
 import subprocess
 
+
 def get_all_days_in_year(year):
     months = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June", 
               7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"}
@@ -93,12 +94,12 @@ def home():
         note = request.form.get('note')
 
         if len(note) < 1:
-            flash('Note is too short!', category='error')
+            flash(_('Note is too short!'), category='error')
         else:
             new_note = Note(data=note, user_id=current_user.id)
             db.session.add(new_note)  # note la db
             db.session.commit()
-            flash('Note added!', category='success')
+            flash(_('Note added!'), category='success')
     
     today = date.today()
     record = TimeSpent.query.filter_by(user_id=current_user.id, date=today).first()
@@ -139,49 +140,10 @@ def delete_note():
     return jsonify({'success': False})  # nu merge
 
 
-@views.route('/change_language/<lang>', methods=['GET'])
-@login_required
-def change_language(lang):
-    if lang in ['en', 'ro', 'fr', 'es']:
-        session['lang'] = lang
-    else:
-        session['lang'] = 'en'
-    print(f"Language set to: {session.get('lang')}")
-    return redirect(request.referrer)
-
-
-
-@views.route('/test')
-def test_translation():
-    lang = request.args.get('lang')
-    if lang in ['en', 'ro', 'fr', 'es']:
-        session['lang'] = lang
-        print(f"[Route] Lang in query set session to: {lang}")
-    return render_template('test_translation.html')
-
-
-
-
-@views.route('/translate')
-def translation_page():
-    return render_template('test_translation.html')
-
-
 @views.route('/set_lang/<lang>')
 def set_lang(lang):
     session['lang'] = lang
-    return redirect(request.referrer or url_for('views.test_translation'))
-
-
-
-@views.route('/compile-translations')
-def compile_translations():
-    try:
-        subprocess.run(['pybabel', 'compile', '-d', 'translations'], check=True)
-        return "Translations compiled successfully!"
-    except subprocess.CalledProcessError as e:
-        return f"Failed to compile translations: {str(e)}", 500
-
+    return redirect(request.referrer or url_for('views.home'))
 
 
 
@@ -221,7 +183,7 @@ def time_tracking():
 def view_day(date):
     record = TimeSpent.query.filter_by(user_id=current_user.id, date=date).first()
     if not record:
-        flash('No data for this date.', 'danger')
+        flash(_('No data for this date.'), 'danger')
         return redirect(url_for('views.time_tracking'))
     
     minutes = record.time_spent_seconds // 60
@@ -309,3 +271,11 @@ def adjusted_save_time():
         session.pop('start_time', None)
 
     return '', 204
+
+
+@views.route('/test-translation', methods=['GET'])
+def test_translation():
+    lang = request.args.get('lang')
+    if lang in ['en', 'ro']:
+        session['lang'] = lang
+    return render_template('test_translation.html')

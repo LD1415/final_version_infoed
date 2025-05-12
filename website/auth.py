@@ -8,6 +8,8 @@ from werkzeug.security import generate_password_hash
 from argon2 import PasswordHasher
 from website import db
 from website.models import User
+from flask_babel import _, Babel
+
  
 auth = Blueprint('auth', __name__)
  

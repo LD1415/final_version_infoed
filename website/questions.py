@@ -10,6 +10,8 @@ from sympy import sympify, SympifyError, simplify
 from math import isclose
 from datetime import datetime
 from pytz import timezone as pytz_timezone, UnknownTimeZoneError
+from flask_babel import Babel, _
+
 
 def safe_eval(expr):
     try:

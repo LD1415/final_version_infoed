@@ -1,10 +1,11 @@
  
-{% extends "base.html" %} {% block title %}{{ _('Sign Up ') }}{% endblock %} {% block
-    content %}
+{% extends "base.html" %} {% block title %}{{ t('Sign Up') }}{% endblock %}
+
+{% block content %}
     <form method="POST">
-      <h3 align="center"> {{ _('Sign Up') }}</h3>
+      <h3 align="center"> {{ t('Sign Up') }}</h3>
       <div class="form-group">
-        <label for="email">{{ _('Email Address') }}</label>
+        <label for="email">{{ t('Email Address') }}</label>
         <input
           type="email"
           class="form-control"
@@ -14,7 +15,7 @@
         />
       </div>
       <div class="form-group">
-        <label for="firstName"> {{ _('First Name') }}</label>
+        <label for="firstName"> {{ t('First Name') }}</label>
         <input
           type="text"
           class="form-control"
@@ -24,7 +25,7 @@
         />
       </div>
       <div class="form-group">
-        <label for="lastName"> {{ _('Last Name') }}</label>
+        <label for="lastName"> {{ t('Last Name') }}</label>
         <input
           type="text"
           class="form-control"
@@ -34,7 +35,7 @@
         />
       </div>
       <div class="form-group">
-        <label for="password1"> {{ _('Password') }}</label>
+        <label for="password1"> {{ t('Password') }}</label>
         <input
           type="password"
           class="form-control"
@@ -44,7 +45,7 @@
         />
       </div>
       <div class="form-group">
-        <label for="password2">{{ _('Password (Confirm) ') }}</label>
+        <label for="password2">{{ t('Password ')}} {{ t('(Confirm)') }} </label>
         <input
           type="password"
           class="form-control"
@@ -54,6 +55,6 @@
         />
       </div>
       <br />
-      <button type="submit" class="btn btn-primary"> {{ _('Submit') }}</button>
+      <button type="submit" class="btn btn-primary"> {{ t('Submit') }}</button>
     </form>
     {% endblock %}

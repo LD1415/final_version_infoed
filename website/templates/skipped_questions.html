@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Skipped Questions') }}{% endblock %}
+{% block title %}{{ t('Skipped Questions') }}{% endblock %}
+
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">{{ _('Skipped Questions') }}</h2>
+    <h2 class="mb-4">{{ t('Skipped Questions') }}</h2>
 
     {% if grouped_skipped %}
         <ul class="list-group">
@@ -22,7 +23,7 @@
             {% endfor %}
         </ul>
     {% else %}
-        <p>{{ _('No skipped questions') }}.</p>
+        <p>{{ t('No skipped questions') }}.</p>
     {% endif %}
 </div>
 {% endblock %}

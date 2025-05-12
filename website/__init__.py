@@ -3,26 +3,30 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager, current_user
 from flask_session import Session
-from flask_babel import Babel
+from flask_babel import Babel, _
 
-from flask import session, request
-from flask_babel import _
+from flask import session, request, g
 from flask_migrate import Migrate
+from functools import lru_cache
 
-
+import json
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
-babel = Babel()
 migrate = Migrate()
 
-def get_locale():
-    return session.get('lang', 'en')
 
 #def get_locale():
  #   lang = session.get('lang', 'en')
    # print(f"[Babel] Selected language: {lang}")
   #  return lang
+
+def load_translations():
+    with open('translations.json', encoding='utf-8') as f:
+        return json.load(f)
+
+def get_lang():
+    return session.get('lang', 'en')
 
 def create_app():
     app = Flask(__name__)
@@ -36,31 +40,16 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
-    app.config['BABEL_DEFAULT_LOCALE'] = 'en'
-    app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'ro', 'fr', 'es']
-    app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
-
-    def get_locale():
-        lang = session.get('lang', 'en')
-        print(f"[Babel] Using language: {lang}")
-        return lang
-
-    babel.init_app(app, locale_selector=get_locale)
-
     @app.context_processor
     def inject_global_vars():
         return dict(_=_)
-
-    from .lang import lang
-
-    app.register_blueprint(lang, url_prefix='/')
 
     from .views import views
     from .auth import auth
     from .models import User, Note, WrongAnswer, SkippedQuestion, Flashcard
     from .questions import questions_bp
 
-
+    translations = load_translations()
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
@@ -85,6 +74,18 @@ def create_app():
             return dict(last_skipped=last_skipped)
         return dict(last_skipped=None)
 
+    @app.before_request
+    def set_translation():
+        lang = get_lang()
+        g.translations = translations.get(lang, {})
+
+    @app.context_processor
+    def inject_translation():
+        translations = g.translations
+        @lru_cache(maxsize=512)
+        def t(text):
+            return translations.get(text, text)
+        return dict(t=t)
 
     return app
 
