@@ -108,11 +108,11 @@
 
 <div class="container center-wrapper">
     <div class="card-box fade-in">
-        <h2 class="mb-4 text-primary text-center">{{ t('Answer the  Question you've Skipped') }}</h2>
+        <h2 class="mb-4 text-primary text-center">{{ t('Answer the  Question you have Skipped') }}</h2>
 
         <form method="POST">
             <div class="form-group">
-                <label for="question">{{ question.question }}</label>
+                <label for="question">{{ t(question_text) }}</label>
             <input type="text" class="form-control" name="user_answer" required>
             </div>
             <div class="button-group">
@@ -130,7 +130,7 @@
                 <div class="alert alert-success fade-in">{{ t('Correct!') }}</div>
                 {% if next_question %}
                     <form method="GET" action="{{ url_for('questions.answer_skipped', question_id=next_question.id) }}">
-                    <button type="submit" class="btn btn-success mt-2">{{ t('Next Question ') }}</button>
+                    <button type="submit" class="btn btn-success mt-2">{{ t('Next Question') }}</button>
                     </form>
                 {% else %}
                         <div class="alert alert-info fade-in">{{ t('No more skipped questions!') }}</div>
@@ -142,7 +142,7 @@
 
         {% if show_answer %}
             <div class="alert alert-info fade-in">
-                {{ t('The correct answer is:') }}<strong>{{ question.answer }}</strong>
+                {{ t('The correct answer is:') }} <strong>{{ t(answer_text) }}</strong>
             </div>
         {% endif %}
 

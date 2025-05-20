@@ -16,6 +16,7 @@
       "Show Correct Answer": "Show Correct Answer",
       "Correct!": "Correct!",
       "Next Question": "Next Question",
+      "Next": "Next",
       "No more skipped questions!": "No more skipped questions!",
       "Incorrect. Try again!": "Incorrect. Try again!",
       "The correct answer is:": "The correct answer is:",
@@ -24,7 +25,7 @@
       "Flashcards Quiz": "Flashcards Quiz",
       "Skip Question": "Skip Question",
       "Correct answer:": "Correct answer:",
-      "Skipped Questions": "Skipped Questions",
+      "Skipped Question": "Skipped Questions",
       "Sort by date: ": "Sort by date: ",
       "Newest First": "Newest First",
       "Oldest First": "Oldest First",
@@ -47,7 +48,13 @@
       "Your Answer": "Your Answer",
       "Wrong on": "Wrong on",
       "Unknown": "Unknown",
-      "You have no wrong answers": "You have no wrong answers"
+      "You have no wrong answers": "You have no wrong answers",
+      "Confirm Password": "Confirm Password",
+      "Enter email": "Enter email",
+      "Enter first name": "Enter first name",
+      "Enter last name": "Enter last name",
+      "Enter password": "Enter password",
+      "Confirm password": "Confirm password"
     },
     "ro": {
       "Home": "Acasă",
@@ -65,7 +72,8 @@
       "Submit Answer": "Răspunde la întrebarea",
       "Show Correct Answer": "Arată răspunsul corect",
       "Correct!": "Corect!",
-      "Next Question ": "Întrebarea următoare",
+      "Next Question": "Întrebarea următoare",
+      "Next": "Următoarea",
       "No more skipped questions!": "Nu mai sunt întrebări omise!",
       "Incorrect. Try again!": "Greșit, încearcă iar!",
       "The correct answer is:": "Răspunsul corect este:",
@@ -74,7 +82,7 @@
       "Flashcards Quiz": "Chestionar cu cartonașe",
       "Skip Question": "Omite întrebarea",
       "Correct answer:": "Răspuns corect:",
-      "Skipped Questions": "Întrebări sărite",
+      "Skipped Question": "Întrebări sărite",
       "Sort by date: ": "Sortează după dată:",
       "Newest First": "Cele mai noi",
       "Oldest First": "Cele mai vechi",
@@ -97,7 +105,13 @@
       "Your Answer": "Răspunsul tău",
       "Wrong on": "Greșit pe",
       "Unknown": "Necunoscut",
-      "You have no wrong answers": "Nu ai răspunsuri greșite"
+      "You have no wrong answers": "Nu ai răspunsuri greșite",
+      "Confirm Password": "Confirmă parola",
+      "Enter email": "Introduceți emailul",
+      "Enter first name": "Introduceți prenumele",
+      "Enter last name": "Introduceți numele",
+      "Enter password": "Introduceți parola",
+      "Confirm password": "Confirmați parola"
     }
   }
   

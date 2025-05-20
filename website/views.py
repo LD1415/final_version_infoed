@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for, session
+from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for, session, g
 from flask_login import current_user, login_required
 from . import db
 from .models import TimeSpent, Note
@@ -145,12 +145,25 @@ def set_lang(lang):
 @views.route('/update-time', methods=['POST'])
 @login_required
 def update_time():
+    now = datetime.utcnow()
+    last_ping = session.get('last_ping')
+
+    if last_ping:
+        try:
+            delta = int((now - datetime.fromtimestamp(last_ping)).total_seconds())
+        except Exception:
+            delta = 0    
+    else:
+        delta = 0
+    session['last_ping'] = now.timestamp()
+    if delta <= 0 or delta > 600:
+        return '', 204
     today = date.today()
     record = TimeSpent.query.filter_by(user_id=current_user.id, date=today).first()
     if not record:
         record = TimeSpent(user_id=current_user.id, date=today, time_spent_seconds=0)
         db.session.add(record)
-    record.time_spent_seconds += 10 
+    record.time_spent_seconds += delta
     db.session.commit()
     return '', 204
 

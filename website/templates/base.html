@@ -37,10 +37,9 @@
                     </a>
                     <a class="nav-item nav-link" id="logout" href="{{ url_for('auth.logout') }}"
                         >{{ t('Logout') }}</a
-                    >{% if last_skipped %}
+                    >
                         <a class="nav-item nav-link" href="{{ url_for('questions.view_skipped') }}">
-                            {{ t('Skipped Questions') }}</a>
-                    {% endif %}
+                            {{ t('Skipped Question') }}</a>
                     <a class="nav-item nav-link" id="wrong" href="{{ url_for('questions.wrong_answers') }}"
                         >{{ t('Wrong Answers') }}
                     </a>           
@@ -49,15 +48,18 @@
                         >{{ t('Login') }}</a
                     >
                     <a class="nav-item nav-link" id="signUp" href="{{ url_for('auth.sign_up') }}"
-                        ></a
+                        >{{ t('Sign Up') }}</a
                     >
                 {% endif %}
             </div>
 
             <div class="navbar-nav ml-auto">
-                <a class="nav-item nav-link" href="{{ url_for('views.set_lang', lang='en') }}">English</a>
+                <a class="nav-item nav-link"  href="{{ url_for('views.set_lang', lang='en') }}">English</a>
                 <a class="nav-item nav-link" href="{{ url_for('views.set_lang', lang='ro') }}">Română</a>
             </div>
+            <!-- d-bug -->
+<p style="color:red;">Logged in: {{ current_user.is_authenticated }}</p>
+
             
         </div>
     </nav>

@@ -1,219 +1,129 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ t('Revision Marathon') }}</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
+{% extends "base.html" %} {% block title %}{{ t('Review Questions') }}{% endblock %}
 
-        .container {
-            background-color: #fff;
-            padding: 60px 80px;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            max-width: 1200px;
-            width: 95%;
-            text-align: center;
-        }
+{% block content %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+    }
 
-        h1 {
-            font-size: 60px;
-            margin-bottom: 20px;
-            color: #333;
-        }
+    .center-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 40px;
+    }
 
-        input[type="text"] {
-            padding: 12px;
-            font-size: 24px;
-            width: 80%;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            margin-bottom: 20px;
-        }
+    .card-box {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+        padding: 70px 80px;
+        width: 100%;
+        max-width: 1800px;
+        transition: box-shadow 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
 
-        .btn {
-            padding: 10px 20px;
-            margin: 10px 5px;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            border-radius: 10px;
-            transition: background-color 0.3s ease;
-        }
+    .card-box:hover {
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+    }
 
-        .btn-info {
-            background-color: #17a2b8;
-            color: white;
-        }
+    .card-box h1 {
+        font-size: 60px;
+        margin-bottom: 20px;
+        color: #333;
+    }
 
-        .btn-info:hover {
-            background-color: #138496;
-        }
+    input[type="text"] {
+        padding: 12px;
+        font-size: 24px;
+        width: 100%;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+    }
 
-        .btn-danger {
-            background-color: #dc3545;
-            color: white;
-        }
+    .btn {
+        padding: 10px 20px;
+        margin: 10px 5px;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        border-radius: 10px;
+        transition: background-color 0.3s ease;
+    }
 
-        .btn-danger:hover {
-            background-color: #c82333;
-        }
+    .btn-info {
+        background-color: #17a2b8;
+        color: white;
+    }
 
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
+    .btn-info:hover {
+        background-color: #138496;
+    }
 
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
 
-        .feedback {
-            font-weight: bold;
-            margin-top: 10px;
-        }
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
 
-        .correct {
-            color: green;
-        }
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
 
-        .incorrect {
-            color: red;
-        }
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
 
-        .answer {
-            color: blue;
-            font-weight: bold;
-        }
+    .feedback {
+        font-weight: bold;
+        margin-top: 10px;
+    }
 
-        .skipped-question {
-            margin-top: 20px;
-            text-align: left;
-        }
+    .correct {
+        color: green;
+    }
 
-        .skipped-question h3 {
-            margin-bottom: 5px;
-        }
+    .incorrect {
+        color: red;
+    }
 
-        .skipped-question a {
-            display: block;
-            margin-left: 10px;
-            text-decoration: none;
-            color: #333;
-        }
+    .answer {
+        color: blue;
+        font-weight: bold;
+    }
 
-        .skipped-question a:hover {
-            text-decoration: underline;
-        }
+    .question-text {
+        font-size: 30px;
+        font-weight: bold;
+        margin-bottom: 25px;
+        color: #333;
+    }
 
-/*skipped section*/
+</style>
 
-        .question-text {
-            font-size: 30px;
-            font-weight: bold;
-            margin-bottom: 25px;
-            color: #333;
-        }
-
-        .skipped-section {
-            margin-top: 40px;
-            padding: 20px;
-            background-color: #fef9e7; 
-            border-radius: 15px;
-            border: 2px solid #f5c518;
-            text-align: left;
-        }
-
-        .skipped-section h3 {
-            font-size: 28px;
-            color: #b8860b;
-            margin-bottom: 10px;
-        }
-
-/*ordine afis*/
-
-        .skipped-date-group h4 {
-            margin-top: 15px;
-            color: #6c757d;
-        }
-
-        .skipped-link {
-            display: block;
-            margin-left: 20px;
-            margin-bottom: 8px;
-            color: #333;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .skipped-link:hover {
-            text-decoration: underline;
-            color: #0056b3;
-        }
-
-        .skipped-date {
-            font-size: 22px;
-            color: #3a3f44;
-            background-color: #e6f7ff;
-            padding: 5px 10px;
-            border-left: 4px solid #17a2b8;
-            margin-top: 20px;
-            border-radius: 5px;
-        }
-
-
-
-        .sort-buttons {
-            margin-bottom: 15px;
-        }
-
-        .sort-buttons .btn {
-            margin-right: 10px;
-        }
-
-        .filter-container {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .filter-container label {
-            margin-right: 10px;
-            font-weight: bold;
-        }
-
-        #date-sort {
-            padding: 6px 10px;
-            font-size: 16px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
-
-
-        </style>
-
-</head>
-<body>
-    <div class="container">
-        <h1>{{ t('Revision Marathon') }}</h1>
+<div class="container center-wrapper">
+    <div class="card-box fade-in">
+        <h1 class="mb-4 text-primary text-center">{{ t('Revision Marathon') }}</h1>
 
         {% if question %}
-            <p class="question-text">{{ question.question }}</p>
+            <p class="question-text">{{ question_text }}</p>
 
             <form method="POST" action="{{ url_for('questions.rev_question') }}">
                 <input type="hidden" name="correct_answer" value="{{ question.answer }}">
                 <input type="hidden" name="card_id" value="{{ question.id }}">
                 <input type="text" name="user_answer" placeholder="Type your answer..." autofocus>
-                
+
                 {% if not show_answer %}
                 <div>
                     <button type="submit" name="action" value="submit" class="btn btn-info">{{ t('Submit Answer') }}</button>
@@ -228,9 +138,27 @@
                 </p>
             {% endif %}
 
+            {% if feedback and 'Correct' in feedback %}
+    <script>
+        setTimeout(function() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{{ url_for('questions.rev_question') }}";
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'action';
+            input.value = 'next';
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        }, 3000);
+    </script>
+            {% endif %}
+
             {% if feedback and 'Correct' not in feedback %}
                 {% if show_answer %}
-                    <p class="answer">{{ t('Correct answer: ') }}{{ question.answer }} </p>
+                    <p class="answer">{{ t('Correct answer:') }} {{ answer_text }}</p>
                     <form method="POST" action="{{ url_for('questions.rev_question') }}">
                         <input type="hidden" name="correct_answer" value="{{ question.answer }}">
                         <input type="hidden" name="card_id" value="{{ question.id }}">
@@ -246,52 +174,8 @@
             {% endif %}
         {% endif %}
 
-        {% if grouped_skipped %}
-        <div class="skipped-section">
-            <h3>{{ t('Skipped Questions') }}</h3>
-
-            <div class="filter-container">
-                <label for="date-sort">{{ t('Sort by date: ') }}</label>
-                <select id="date-sort" onchange="sortDates(this.value)">
-                    <option value="desc" selected> {{ t('Newest First') }}</option>
-                    <option value="asc">{{ t('Oldest First') }}</option>
-                </select>
-            </div>
-            <div id="skipped-dates-container">
-                {% for date, questions in grouped_skipped.items() %}
-                    <div class="skipped-date-group" data-date="{{ date }}">
-                        <h4 class="skipped-date">{{ date }}</h4>
-                        {% for question in questions %}
-                            <a class="skipped-link" href="{{ url_for('questions.answer_skipped', question_id=question.id) }}">
-                                {{ question.question }}
-                            </a>
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-
-        <button class="btn btn-secondary" onclick="location.href='/'">{{ t('Home ') }}</button>
+        <button class="btn btn-secondary" onclick="location.href='/'">{{ t('Home') }}</button>
     </div>
-</body>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        sortDates('desc');
-    });
+</div>
 
-    function sortDates(order) {
-        const container = document.getElementById('skipped-dates-container');
-        const dateGroups = Array.from(container.querySelectorAll('.skipped-date-group'));
-
-        dateGroups.sort((a, b) => {
-            const dateA = new Date(a.getAttribute('data-date'));
-            const dateB = new Date(b.getAttribute('data-date'));
-            return order === 'asc' ? dateA - dateB : dateB - dateA;
-        });
-
-        container.innerHTML = '';
-        dateGroups.forEach(group => container.appendChild(group));
-    }
-</script>
-</html>
+{% endblock %}

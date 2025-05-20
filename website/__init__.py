@@ -9,6 +9,7 @@ from flask_migrate import Migrate
 from functools import lru_cache
 import json
 import os
+from datetime import timedelta
 
 
 db = SQLAlchemy()
@@ -30,12 +31,22 @@ translations = {}
 def load_translations():
     with open('translations.json', encoding='utf-8') as f:
         return json.load(f)
+    with open('quest_trans.json', encoding='utf-8') as f:
+        question_translations = json.load(f)
+
+    for lang, items in question_translations.items():
+        if lang not in base_translations:
+            base_translations[lang] = {}
+        base_translations[lang].update(items)
+    return base_translations
 
 
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = '`123456dxct56 2435467ueysdfgt`'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
 
     app.config["SESSION_PERMANENT"] = True
     app.config["SESSION_TYPE"] = "filesystem"
@@ -48,8 +59,13 @@ def create_app():
     app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'ro']
     app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
 
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
+
     global translations
     translations = load_translations()
+
+    with open('quest_trans.json', encoding='utf-8') as f:
+        question_translations = json.load(f)
 
     def get_lang():
         return session.get('lang', 'en')
@@ -87,14 +103,21 @@ def create_app():
 
     @app.after_request
     def disable_cache(response):
-        response.headers['Cache-Control'] = 'no-store'
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
         return response
 
     @app.before_request
     def set_translation():
         lang = session.get('lang', 'en')
+        g.lang = lang
         g.translations = translations.get(lang, {})
+        g.question_translations = question_translations.get(lang, {})
 
+    @app.before_request
+    def refresh_session_timeout():
+        session.permanent = True
 
     @app.context_processor
     def inject_translation():
@@ -105,14 +128,10 @@ def create_app():
 
     @app.context_processor
     def inject_globals():
-        context = {'_': _}
-        if current_user.is_authenticated:
-            last_skipped = SkippedQuestion.query.filter_by(user_id=current_user.id)\
-                .order_by(SkippedQuestion.timestamp.desc()).first()
-            context['last_skipped'] = last_skipped
-        else:
-            context['last_skipped'] = None
-        return context
+        return {
+            't': lambda text: g.get('translations', {}).get(text, text),
+            'current_lang': g.get('lang', 'en')
+        }
 
 
     return app

@@ -60,6 +60,18 @@
     transform: scale(1.03);
     opacity: 0.95;
   }
+  
+  .btn-primary {
+    background-color: #007bff;
+    color: white;
+    border: none;
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+  }
 
   .password-toggle {
     position: absolute;
@@ -99,10 +111,12 @@
           name="password"
           placeholder="Enter password"
         />
-        <span class="password-toggle" onclick="togglePassword()">{{ t('see') }}</span>
+        <span class="password-toggle" onclick="togglePassword()">👁️</span>
       </div>
       <br />
       <button type="submit" class="btn btn-primary">{{ t('Login') }}</button>
+
+      <a href="/sign-up" class="btn btn-secondary">{{ t('Sign up') }}</a>
     </form>
 
     <script>

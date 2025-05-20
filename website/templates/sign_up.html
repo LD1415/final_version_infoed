@@ -2,6 +2,102 @@
 {% extends "base.html" %} {% block title %}{{ t('Sign Up') }}{% endblock %}
 
 {% block content %}
+  <style>
+    body {
+      background-color: #d7dee4;
+    }
+    
+    .signup-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px;
+    }
+
+    .signup-box {
+      background-color: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+      padding: 100px 100px;
+      width: 100%;
+      max-width: 1500px;
+    }
+    .signup-box h3 {
+      text-align: center;
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 60px;
+    }
+
+    .form-group label {
+      font-weight: 700;
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .form-control {
+      border-radius: 16px;
+      padding: 24px;
+      font-size: 1.6rem;
+      margin-top: 10px;
+    }
+    .btn {
+      width: 100%;
+      padding: 24px;
+      font-size: 1.8rem;
+      border-radius: 14px;
+      transition: all 0.2s ease-in-out;
+      margin-top: 40px;
+    }
+
+    .btn:hover {
+      transform: scale(1.03);
+      opacity: 0.95;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 30px;
+      top: 68px;
+      cursor: pointer;
+      font-size: 1.4rem;
+      color: #007bff;
+    }
+    .form-group.password-group {
+      position: relative;
+      margin-top: 40px;
+    }
+
+    .alert-container {
+      margin-bottom: 30px;  
+    }
+
+    .alert-error {
+      background-color: #f8d7da;
+      color: #842029;
+      border: 1px solid #f5c2c7;
+      border-radius: 12px;
+      padding: 20px;
+      font-size: 1.5rem;
+    }
+    </style>
+
+<div class="signup-wrapper">
+  <div class="signup-box">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="alert-container">
+      {% for category, message in messages %}
+      <div class="alert alert-{{ category }} mt-3" role="alert">
+       {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
     <form method="POST">
       <h3 align="center"> {{ t('Sign Up') }}</h3>
       <div class="form-group">
@@ -11,7 +107,7 @@
           class="form-control"
           id="email"
           name="email"
-          placeholder="Enter email"
+          placeholder="{{ t('Enter email') }}"
         />
       </div>
       <div class="form-group">
@@ -21,7 +117,7 @@
           class="form-control"
           id="firstName"
           name="firstName"
-          placeholder="Enter first name"
+          placeholder="{{ t('Enter first name') }}"
         />
       </div>
       <div class="form-group">
@@ -31,7 +127,7 @@
           class="form-control"
           id="lastName"
           name="lastName"
-          placeholder="Enter last name"
+          placeholder="{{ t('Enter last name') }}"
         />
       </div>
       <div class="form-group">
@@ -41,20 +137,22 @@
           class="form-control"
           id="password1"
           name="password1"
-          placeholder="Enter password"
+          placeholder="{{ t('Enter password') }}"
         />
       </div>
       <div class="form-group">
-        <label for="password2">{{ t('Password ')}} {{ t('(Confirm)') }} </label>
+        <label for="password2">{{ t('Password')}} {{ t('(Confirm)') }} </label>
         <input
           type="password"
           class="form-control"
           id="password2"
           name="password2"
-          placeholder="Confirm password"
+          placeholder="{{ t('Password')}} {{ t('(Confirm)') }}"
         />
       </div>
       <br />
       <button type="submit" class="btn btn-primary"> {{ t('Submit') }}</button>
     </form>
+      </div>
+</div>
     {% endblock %}

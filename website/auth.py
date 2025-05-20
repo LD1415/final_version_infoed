@@ -1,5 +1,5 @@
  
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
@@ -21,6 +21,8 @@ def login():
         password = request.form.get('password')
  
         user = User.query.filter_by(email=email).first()
+        login_user(user, remember=True)
+        session.permanent = True
         if user:
             print(f"Stored hash: {user.password}")
             # Argon2 verif parola
@@ -44,7 +46,12 @@ def login():
 @auth.route('/logout')
 @login_required
 def logout():
+    print("[DEBUG] Before logout:", current_user.is_authenticated)
+    lang = session.get('lang', 'en')  
     logout_user()
+    session.clear()                   
+    session['lang'] = lang           
+    print("[DEBUG] After logout:", current_user.is_authenticated)
     return redirect(url_for('auth.login'))
  
 from argon2 import PasswordHasher
@@ -57,6 +64,11 @@ def sign_up():
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
  
+        user = User.query.filter_by(email=email).first()
+        if user:
+            flash("Email already exists, please login or use a different email.", category="error")
+            return redirect(url_for('auth.sign_up'))
+
         if password1 != password2:
             flash("Passwords don't match!", category="error")
         else:
@@ -68,6 +80,8 @@ def sign_up():
  
             db.session.add(new_user)
             db.session.commit()
+            login_user(new_user, remember=True)
+            session.permanent = True
             flash("Account created successfully!", category="success")
             return redirect(url_for("auth.login"))
  

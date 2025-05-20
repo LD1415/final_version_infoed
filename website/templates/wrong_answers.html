@@ -142,7 +142,7 @@
         <div class="question-container" data-question="{{ question | lower }}" onclick="toggleDetails('details-{{ loop.index }}')">
             <strong>{{ question }}</strong>
         <div id="details-{{ loop.index }}" class="details-box">
-            <p><strong>{{ t('Correct Answer') }}: </strong> {{ answers[0].correct_answer }}</p>
+            <p><strong>{{ t('Correct Answer') }}: </strong> {{ answers[0].translated_correct  }}</p>
             <hr>
             {% for answer in answers %}
                 <div class="answer-block">

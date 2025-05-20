@@ -105,108 +105,11 @@
             font-weight: bold;
         }
 
-        .skipped-question {
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        .skipped-question h3 {
-            margin-bottom: 5px;
-        }
-
-        .skipped-question a {
-            display: block;
-            margin-left: 10px;
-            text-decoration: none;
-            color: #333;
-        }
-
-        .skipped-question a:hover {
-            text-decoration: underline;
-        }
-
-/*skipped section*/
-
         .question-text {
             font-size: 30px;
             font-weight: bold;
             margin-bottom: 25px;
             color: #333;
-        }
-
-        .skipped-section {
-            margin-top: 40px;
-            padding: 20px;
-            background-color: #fef9e7; 
-            border-radius: 15px;
-            border: 2px solid #f5c518;
-            text-align: left;
-        }
-
-        .skipped-section h3 {
-            font-size: 28px;
-            color: #b8860b;
-            margin-bottom: 10px;
-        }
-
-/*ordine afis*/
-
-        .skipped-date-group h4 {
-            margin-top: 15px;
-            color: #6c757d;
-        }
-
-        .skipped-link {
-            display: block;
-            margin-left: 20px;
-            margin-bottom: 8px;
-            color: #333;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .skipped-link:hover {
-            text-decoration: underline;
-            color: #0056b3;
-        }
-
-        .skipped-date {
-            font-size: 22px;
-            color: #3a3f44;
-            background-color: #e6f7ff;
-            padding: 5px 10px;
-            border-left: 4px solid #17a2b8;
-            margin-top: 20px;
-            border-radius: 5px;
-        }
-
-
-
-        .sort-buttons {
-            margin-bottom: 15px;
-        }
-
-        .sort-buttons .btn {
-            margin-right: 10px;
-        }
-
-        .filter-container {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .filter-container label {
-            margin-right: 10px;
-            font-weight: bold;
-        }
-
-        #date-sort {
-            padding: 6px 10px;
-            font-size: 16px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
         }
 
 
@@ -216,7 +119,7 @@
             <h1 class="mb-4 text-primary text-center">{{ t('Flashcards Quiz') }}</h1>
 
         {% if question %}
-            <p class="question-text">{{ question.question }}</p>
+            <p class="question-text">{{ question_text }}</p>
 
             <form method="POST">
                 <input type="hidden" name="correct_answer" value="{{ question.answer }}">
@@ -238,10 +141,26 @@
                     {{ feedback }}
                 </p>
             {% endif %}
+            {% if feedback and 'Correct' in feedback %}
+        <script>
+            setTimeout(function() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'action';
+                input.value = 'next';
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }, 3000);
+        </script>
+            {% endif %}
 
             {% if feedback and 'Correct' not in feedback %}
                 {% if show_answer %}
-                    <p class="answer">{{ t('Correct answer:') }} {{ question.answer }} </p>
+                    <p class="answer">{{ t('Correct answer:') }} {{ answer_text  }} </p>
                     <form method="POST">
                         <input type="hidden" name="correct_answer" value="{{ question.answer }}">
                         <input type="hidden" name="card_id" value="{{ question.id }}">
@@ -258,31 +177,8 @@
             {% endif %}
         {% endif %}
 
-        {% if grouped_skipped %}
-        <div class="skipped-section">
-            <h3>{{ t('Skipped Questions') }}</h3>
-        
-            <div class="filter-container">
-                <label for="date-sort">{{ t('Sort by date: ') }}</label>
-                <select id="date-sort" onchange="sortDates(this.value)">
-                    <option value="desc" selected> {{ t('Newest First') }}</option>
-                    <option value="asc">{{ t('Oldest First') }}</option>
-                </select>
-            </div>
-            <div id="skipped-dates-container">
-                {% for date, questions in grouped_skipped.items() %}
-                    <div class="skipped-date-group" data-date="{{ date }}">
-                        <h4 class="skipped-date">{{ date }}</h4>
-                        {% for question in questions %}
-                            <a class="skipped-link" href="{{ url_for('questions.answer_skipped', question_id=question.id) }}">
-                                {{ question.question }}
-                            </a>
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        
+        {% if show_skipped and grouped_skipped %}
+            {% include 'view_skipped.html' %}
         {% endif %}
 
         <button class="btn btn-secondary" onclick="location.href='/'">{{ t('Home ') }}</button>

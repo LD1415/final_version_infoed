@@ -1,0 +1,135 @@
+{% extends "base.html" %} {% block title %}{{ t('Skipped Questions') }}{% endblock %}
+{% block content %}
+
+<style>
+    .question-text {
+        font-size: 30px;
+        font-weight: bold;
+        margin-bottom: 25px;
+        color: #333;
+    }
+
+    .skipped-section {
+        margin: 60px;
+        margin-top: 40px;
+        padding: 20px;
+        background-color: #fef9e7;
+        border-radius: 15px;
+        border: 2px solid #f5c518;
+        text-align: left;
+    }
+
+    .skipped-section h3 {
+        font-size: 28px;
+        color: #b8860b;
+        margin-bottom: 10px;
+    }
+
+    .filter-container {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .filter-container label {
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    #date-sort {
+        padding: 6px 10px;
+        font-size: 16px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+
+    .skipped-date-group {
+        margin-bottom: 25px;
+    }
+
+    .skipped-date {
+        font-size: 22px;
+        color: #3a3f44;
+        background-color: #e6f7ff;
+        padding: 5px 10px;
+        border-left: 10px solid #17a2b8; 
+        margin-top: 20px;
+        border-radius: 5px;
+        border-left-width: 5px;
+    }
+
+    .skipped-questions-box {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-left: 5px solid #f5c518;
+        border-radius: 10px;
+        padding: 15px 20px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .skipped-link {
+        display: block;
+        margin-bottom: 10px;
+        color: #333;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 18px;
+        padding: 6px 0;
+        border-radius: 5px;
+        transition: background-color 0.2s ease;
+    }
+
+    .skipped-link:hover {
+        background-color: #f2f2f2;
+    }
+</style>
+
+{% if grouped_skipped %}
+<div class="skipped-section">
+    <h3>{{ t('Skipped Questions') }}</h3>
+
+    <div class="filter-container">
+        <label for="date-sort">{{ t('Sort by date: ') }}</label>
+        <select id="date-sort" onchange="sortDates(this.value)">
+            <option value="desc" selected>{{ t('Newest First') }}</option>
+            <option value="asc">{{ t('Oldest First') }}</option>
+        </select>
+    </div>
+
+    <div id="skipped-dates-container">
+        {% for date, questions in grouped_skipped.items() %}
+        <div class="skipped-date-group" data-date="{{ date }}">
+            <h4 class="skipped-date">{{ date }}</h4>
+            <div class="skipped-questions-box">
+                {% for question in questions %}
+                <a class="skipped-link" href="{{ url_for('questions.answer_skipped', question_id=question.id) }}">
+                    {{ question.translated_question }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        sortDates('desc');
+    });
+
+    function sortDates(order) {
+        const container = document.getElementById('skipped-dates-container');
+        const dateGroups = Array.from(container.querySelectorAll('.skipped-date-group'));
+
+        dateGroups.sort((a, b) => {
+            const dateA = new Date(a.getAttribute('data-date'));
+            const dateB = new Date(b.getAttribute('data-date'));
+            return order === 'asc' ? dateA - dateB : dateB - dateA;
+        });
+
+        container.innerHTML = '';
+        dateGroups.forEach(group => container.appendChild(group));
+    }
+</script>
+{% endblock %}
