@@ -4,38 +4,37 @@ What is the domain of a function?,set of allowed values,9
 What is the codomain of a function?,image set,9
 When is a function increasing (x1 < x2)?,f(x1) < f(x2),9
 When is a function decreasing (x1 < x2)?,f(x1) > f(x2),9
-What does it mean for a function to be even?,f(-x) = f(x),9
-What does it mean for a function to be odd?,f(-x) = -f(x),9
+What does it mean for a function to be even?,f( - x) = f(x),9
+What does it mean for a function to be odd?,f( - x) = - f(x),9
 What is the formula for the distance between two points?,Pythagorean theorem,9
-What is the formula for the slope of a line?,y/x,9
+What is the formula for the slope of a line?,y / x,9
 What is a vector in the plane?,oriented segment,9
-What is sine in a right triangle?,opposite/hypotenuse,10
-What is cosine in a right triangle?,adjacent/hypotenuse,10
-What is the fundamental trigonometric identity?,sin ^ 2 x + cos ^2 x = 1,10
-What is tangent of an angle?,sin/cos,10
-What is cotangent of an angle?,cos/sin,10
+What is sine in a right triangle?,opposite / hypotenuse,10
+What is cosine in a right triangle?,adjacent / hypotenuse,10
+What is the fundamental trigonometric identity?,sin ^ 2 x + cos ^ 2 x = 1,10
+What is tangent of an angle?,sin / cos,10
+What is cotangent of an angle?,cos / sin,10
 What are the standard trigonometric values?,notable angles,10
-What is the limit of a function?,target value,11
 What is continuity?,limit equals value,11
 What is the derivative?,rate of change,11
 What is the geometric meaning of the derivative?,slope of tangent,11
 What is the derivative of x^n?,n * x ^ (n - 1),11
 What is the derivative of a composite function?,chain rule,11
 What is probability?,numerical chance,12
-What is the formula for probability?,favorable/total,12
+What is the formula for probability?,favorable / total,12
 What are mutually exclusive events?,cannot occur together,12
 What is the arithmetic mean?,sum / count,12
 What is the median?,central value,12
 What is an exponential function?,a ^ x,11
 A function is both continuous and monotonic. So what kind of function is it?,exponential,11
-What kind of function is the inverse of an exponential function?,logarithmcs,11
+What kind of function is the inverse of an exponential function?,logarithmic,11
 What are logarithmic properties?,"sum, difference, power",11
-What is base change in logarithms?,log(x)/log(b),11
+What is base change in logarithms?,log(x) / log(b),11
 What is a matrix?,numeric table,12
 What is a square matrix?,rows = columns,12
 Determinant of a 2x2 matrix?,a * d - b * c,12
 What is an invertible matrix?,det != 0,12
-Inverse of a 2x2 matrix?,1/det * adj,12
+Inverse of a 2x2 matrix?,1 / det * adj,12
 What is an equation?,equality with unknowns,9
 What does solving an equation mean?,finding solutions,9
 Solution of a first-degree equation?,x = - b / a,9
@@ -44,27 +43,27 @@ Solution of a first-degree inequality?,isolate x,9
 What is the position vector of a point?,"(x, y)",10
 What is the norm of a vector?,sqrt(x ^ 2 + y ^ 2),10
 What is the dot product?,|a| * |b| * cosθ,10
-Dot product in coordinates?,x1x2 + y1y2,10
+Dot product in coordinates?,x1 * x2 + y1 * y2,10
 When are vectors orthogonal?,dot product = 0,10
 Line equation with slope?,y - y0 = m * (x - x0),10
-General equation of a line?,ax + by + c = 0,10
+General equation of a line?,a * x + b * y + c = 0,10
 How to check point on line?,substitute in equation,10
-Condition for parallel lines?,a1/a2 = b1/b2,10
+Condition for parallel lines?,a1 / a2 = b1 / b2,10
 Condition for perpendicular lines?,a1 * a2 + b1 * b2 = 0,10
 What is a complex number?,a + b * i,12
 Parts of a complex number?,"real, imaginary",12
 Modulus of a complex number?,sqrt(a ^ 2 + b ^ 2),12
 Conjugate of a complex number?,a - b * i,12
 Multiplication of complex numbers?,distributive rule,12
-Trigonometric form (0 is the angel)?,r ^ (cosθ + i * sinθ),12
-De Moivre’s formula (0 is the angel)?,r ^ n * [cos(n * θ) + i * sin(n * θ)],12
+Trigonometric form (0 is the angel)?,r * (cosθ + i * sinθ),12
+De Moivre’s formula (0 is the angel)?,r ^ n * [cos(n * θ) + i * sin(n * θ)],10
 What is a definite integral?,signed area,12
 What is an antiderivative?,primitive function,12
-∫xⁿ dx?,x * (n + 1)/(n + 1),12
+∫xⁿ dx?,x * (n + 1) / (n + 1),12
 ∫1/x dx?,ln|x|,12
 What kind of integration is this uv - ∫u'v by:,Parts,12
 Fundamental theorem of calculus?,F(b) - F(a),12
 Permutations of n elements?,n!,11
-Arrangements A_n^k?,n!/(n - k)!,11
-Combinations C_n^k?,n!/[k!(n - k)!],11
-What is the form of the Binomial theorem?,(a + b)^n,11
+Arrangements A_n^k?,n! / (n - k)!,11
+Combinations C_n^k?,n! / [k! (n - k)!],11
+What is the form of the Binomial theorem?,(a + b) ^ n,11

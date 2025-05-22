@@ -109,14 +109,12 @@ def create_app():
         return response
 
     @app.before_request
-    def set_translation():
+    def before_request_combined():
         lang = session.get('lang', 'en')
         g.lang = lang
         g.translations = translations.get(lang, {})
         g.question_translations = question_translations.get(lang, {})
 
-    @app.before_request
-    def refresh_session_timeout():
         session.permanent = True
 
     @app.context_processor

@@ -21,10 +21,9 @@ def login():
         password = request.form.get('password')
  
         user = User.query.filter_by(email=email).first()
-        login_user(user, remember=True)
         session.permanent = True
         if user:
-            print(f"Stored hash: {user.password}")
+            print(f"[DEBUG] Attempt login for: {email}")
             # Argon2 verif parola
             ph = PasswordHasher()
             try:
@@ -32,9 +31,11 @@ def login():
                 ph.verify(user.password, password)
                 flash('Logged in successfully!', category='success')
                 login_user(user, remember=True)
+                session.permanent = True
                 return redirect(url_for('views.home'))
-            except:
+            except Exception as e:
                 flash('Incorrect password, try again.', category='error')
+                print(f"[ERROR] Login exception: {e}")
         else:
             flash('Email does not exist.', category='error')
  
@@ -49,10 +50,15 @@ def logout():
     print("[DEBUG] Before logout:", current_user.is_authenticated)
     lang = session.get('lang', 'en')  
     logout_user()
-    session.clear()                   
-    session['lang'] = lang           
+    
+    session.clear()
+    session['lang'] = lang
+
+    resp = redirect(url_for('auth.login'))
+    resp.set_cookie('remember_token', '', expires=0)
     print("[DEBUG] After logout:", current_user.is_authenticated)
-    return redirect(url_for('auth.login'))
+    return resp
+
  
 from argon2 import PasswordHasher
  

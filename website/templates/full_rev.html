@@ -115,10 +115,9 @@
 <div class="container center-wrapper">
     <div class="card-box fade-in">
         <h1 class="mb-4 text-primary text-center">{{ t('Revision Marathon') }}</h1>
-
-        {% if question %}
             <p class="question-text">{{ question_text }}</p>
 
+        {% if question %}
             <form method="POST" action="{{ url_for('questions.rev_question') }}">
                 <input type="hidden" name="correct_answer" value="{{ question.answer }}">
                 <input type="hidden" name="card_id" value="{{ question.id }}">

@@ -6,7 +6,7 @@ import csv
 import os
 import random, ast
 from collections import defaultdict
-from sympy import sympify, SympifyError, simplify
+from sympy import sympify, SympifyError, Eq
 from math import isclose
 from datetime import datetime
 from pytz import timezone as pytz_timezone, UnknownTimeZoneError
@@ -14,6 +14,219 @@ from flask_babel import Babel, _, get_locale
 import json
 import io
 
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import nltk
+from nltk.corpus import wordnet as wn
+from nltk.tokenize import sent_tokenize
+import nltk.data
+
+import unicodedata
+from sympy.parsing.sympy_parser import parse_expr, standard_transformations, implicit_multiplication_application, convert_xor
+from sympy.core.relational import Relational
+
+
+#nltk.download('wordnet')
+#nltk.download('omw-1.4')
+#nltk.download('punkt')
+
+from nltk.tokenize.punkt import PunktLanguageVars, PunktSentenceTokenizer
+from nltk.stem import WordNetLemmatizer
+import re
+from difflib import SequenceMatcher
+import types
+
+try:
+    correct_expr = sympify(correct_answer)
+    print("Parsed correct:", correct_expr, type(correct_expr))
+
+    if isinstance(correct_expr, types.FunctionType) or callable(correct_expr):
+        raise TypeError("correct is a func, not equiv exp.")
+
+    correct_value = correct_expr.evalf()
+except Exception as e:
+    print("Error parsing or eval correct:", e)
+    correct_value = None
+WORD_TO_MATH = {
+    "plus": "+", "minus": "-", "times": "*", "multiplied by": "*", "divided by": "/", "over": "/", "equals": "=", "equal to": "=", "is equal to": "=", "greater than": ">", "less than": "<", "power of": "^", "squared": "^2", "cubed": "^3"
+}
+
+NUM_WORDS = {
+    "zero": "0", "one": "1", "two": "2", "three": "3", "four": "4", "five": "5", "six": "6", "seven": "7", "eight": "8", "nine": "9", "ten": "10"
+}
+
+math_transformations = standard_transformations + (
+    implicit_multiplication_application,
+    convert_xor,
+)
+
+def is_math_expression(text):
+    return bool(re.search(r'[\d\+\-\*/\^\=\(\)xXaAbBcC]', text))
+
+def clean_math_expr(expr):
+    return re.sub(r'\s+', '', expr)
+
+def text_to_math_expression(text):
+    text = text.lower()
+    for word, num in NUM_WORDS.items():
+        text = re.sub(rf'\b{word}\b', num, text)
+
+    for phrase, symbol in sorted(WORD_TO_MATH.items(), key=lambda x: -len(x[0])):
+        text = re.sub(rf'\b{phrase}\b', f' {symbol} ', text)
+
+    text = ' '.join(text.split())
+    return clean_math_expr(text)
+
+def get_synonyms(word):
+    synonyms = set()
+    for syn in wn.synsets(word):
+        for lemma in syn.lemmas():
+            synonyms.add(lemma.name().replace('_', ' '))
+    return list(synonyms)
+
+def semantic_search_in_csv(search_term, file_path='data.csv', column='question', top_n=5):
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"{file_path} not found.")
+
+    df = pd.read_csv(file_path)
+    if column not in df.columns:
+        raise ValueError(f"Column '{column}' not found in {file_path}.")
+
+    texts = df[column].fillna('').astype(str).tolist()
+    synonyms = get_synonyms(search_term)
+    extended_query = [search_term] + synonyms
+
+    vectorizer = TfidfVectorizer()
+    corpus = texts + [' '.join(extended_query)]
+    tfidf_matrix = vectorizer.fit_transform(corpus)
+
+    query_vec = tfidf_matrix[-1]
+    text_vecs = tfidf_matrix[:-1]
+
+    similarities = cosine_similarity(query_vec, text_vecs).flatten()
+    top_indices = similarities.argsort()[-top_n:][::-1]
+
+    return df.iloc[top_indices].to_dict(orient='records')
+
+
+def remove_spaces(text):
+    return re.sub(r'\s+', '', text.lower().strip())
+
+def remove_diacritics(text):
+    return ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
+
+def clean_expression(expr):
+    expr = remove_diacritics(expr)
+    expr = expr.replace(" ", "")
+    return expr
+
+lemmatizer = WordNetLemmatizer()
+
+def normalize_text(text):
+    # ascii
+    text = unicodedata.normalize('NFD', text)
+    text = text.encode('ascii', 'ignore').decode('utf-8')  # fara diacritice
+    text = re.sub(r'[^\w\s]', '', text.lower().strip())
+    return [lemmatizer.lemmatize(word) for word in text.split() if word]
+
+def semantic_match(user_input, correct_answer):
+    tokens_user = set(normalize_text(user_input))
+    tokens_correct = set(normalize_text(correct_answer))
+    overlap = tokens_user.intersection(tokens_correct)
+    score = len(overlap) / max(len(tokens_correct), 1)
+    return score
+
+def word_tokenize(text):
+    return text.lower().split()
+
+def synonym_expand(text):
+    if not text.strip():
+        return ["empty input"]
+    tokens = word_tokenize(text.lower())
+    lemmatized = [lemmatizer.lemmatize(token) for token in tokens]
+    expanded = set(lemmatized)
+
+    for word in lemmatized:
+        for syn in wn.synsets(word):
+            for lemma in syn.lemmas():
+                expanded.add(lemmatizer.lemmatize(lemma.name().lower().replace("_", " ")))
+    return list(expanded)
+
+def semantic_token_overlap_score(user_text, correct_text):
+    user_tokens = set(normalize_text(user_text))
+    correct_tokens = set(normalize_text(correct_text))
+    
+    if not user_tokens or not correct_tokens:
+        return 0.0
+
+    overlap = user_tokens.intersection(correct_tokens)
+    return len(overlap) / len(correct_tokens)
+    
+def unordered_word_match(user, correct):
+# correct orice ord
+    user_words = set(normalize_text(user))
+    correct_words = set(normalize_text(correct))
+    if not correct_words:
+        return 0.0
+    return len(user_words & correct_words) / len(correct_words)
+
+def semantic_similarity_score(user_answer, correct_answer):
+    if user_answer.strip().lower() == correct_answer.strip().lower():
+        return 1.0
+
+    user_expanded = " ".join(synonym_expand(user_answer))
+    correct_expanded = " ".join(synonym_expand(correct_answer))
+
+    print("u input:", user_answer)
+    print("u exp:", user_expanded)
+    print("ok input:", correct_answer)
+    print("ok exp:", correct_expanded)
+
+    if not user_expanded.strip() or not correct_expanded.strip():
+        return 0.0
+
+    try:
+        vectorizer = TfidfVectorizer(stop_words=None).fit([user_expanded, correct_expanded])
+        tfidf_matrix = vectorizer.transform([user_expanded, correct_expanded])
+        score = cosine_similarity(tfidf_matrix[0], tfidf_matrix[1])[0][0]
+        return score
+    except ValueError:
+        return 0.0
+
+def evaluate_user_answer(user_answer, correct_answer):
+    user_answer = user_answer.strip()
+    correct_answer = correct_answer.strip()
+
+    try:
+        # cuv la mate
+        if is_math_expression(user_answer) or any(w in user_answer.lower() for w in WORD_TO_MATH):
+            user_answer = text_to_math_expression(user_answer)
+        if is_math_expression(correct_answer) or any(w in correct_answer.lower() for w in WORD_TO_MATH):
+            correct_answer = text_to_math_expression(correct_answer)
+
+        # verif spatii
+        if user_answer.lower() == correct_answer.lower():
+            return 1.0
+        if remove_spaces(user_answer) == remove_spaces(correct_answer):
+            return 1.0
+
+        correct_expr = parse_expr(correct_answer, transformations=math_transformations)
+        user_expr = parse_expr(user_answer, transformations=math_transformations)
+
+        if isinstance(correct_expr, Relational) and isinstance(user_expr, Relational):
+            return 1.0 if correct_expr.equals(user_expr) else 0.0
+        if abs(correct_expr.evalf() - user_expr.evalf()) < 1e-6:
+            return 1.0
+
+    except Exception as e:
+        print("Math evaluation failed:", e)
+
+    if unordered_word_match(user_answer, correct_answer) >= 0.8:
+        return 1.0
+    if semantic_token_overlap_score(user_answer, correct_answer) >= 0.8:
+        return 1.0
+    return semantic_similarity_score(user_answer, correct_answer)
 
 def safe_eval(expr):
     try:
@@ -147,17 +360,26 @@ def questionnaire():
                 session.pop('index', None)
                 return render_template('flashcards.html', question=None, feedback=None, show_answer=False, skipped_questions=None)
         elif action == 'submit':
-            try:
-            # bey bey space
-                user_expr = sympify(user_input.replace(" ", ""))
-                correct_expr = sympify(translated_correct_answer.replace(" ", ""))
-                user_value = user_expr.evalf()
-                correct_value = correct_expr.evalf()
-                is_correct = isclose(float(user_value), float(correct_value), rel_tol=1e-9)
-            except (SympifyError, ValueError, TypeError):
-            # string cmp
-                is_correct = (user_input.replace(" ", "").lower() == translated_correct_answer.replace(" ", "").lower())
+            def normalize(text):
+                lemmatizer = WordNetLemmatizer()
+                text = text.lower().strip()
+                text = re.sub(r'\s+', ' ', text)
+                words = text.split()
+                return ' '.join([lemmatizer.lemmatize(word) for word in words])
 
+            norm_user = normalize(user_input)
+            norm_correct = normalize(translated_correct_answer)
+
+            ratio = SequenceMatcher(None, norm_user, norm_correct).ratio()
+            is_correct = ratio > 0.75 
+
+#            # bey bey space
+ #               user_expr = sympify(user_input.replace(" ", ""))
+  #              correct_expr = sympify(translated_correct_answer.replace(" ", ""))
+   #             user_value = user_expr.evalf()
+    #            correct_value = correct_expr.evalf()
+     #           is_correct = isclose(float(user_value), float(correct_value), rel_tol=1e-9)
+               
             if is_correct:
                 feedback ="Correct!"
                 if card_id:
@@ -292,18 +514,22 @@ def answer_skipped(question_id):
         if 'show_answer' in request.form:
             show_answer= True
         elif 'user_answer' in request.form:
-            user_answer = request.form.get('user_answer', '').strip()
+            user_input = request.form.get('user_answer', '').strip()
             correct_answer = current_question.answer.strip()
-            try:
-            # bye bye space
-                user_expr = sympify(user_answer.replace(" ", ""))
-                correct_expr = sympify(correct_answer.replace(" ", ""))
-                user_value = user_expr.evalf()
-                correct_value = correct_expr.evalf()
-                is_correct = isclose(float(user_value), float(correct_value), rel_tol=1e-9)
-            except (SympifyError, ValueError, TypeError):
-            # string cmp
-                is_correct = (user_answer.replace(" ", "").lower() == correct_answer.replace(" ", "").lower())
+            translated_correct_answer = g.question_translations.get(correct_answer, correct_answer)
+
+            def normalize(text):
+                lemmatizer = WordNetLemmatizer()
+                text = text.lower().strip()
+                text = re.sub(r'\s+', ' ', text)
+                words = text.split()
+                return ' '.join([lemmatizer.lemmatize(word) for word in words])
+
+            norm_user = normalize(user_input)
+            norm_correct = normalize(translated_correct_answer)
+
+            ratio = SequenceMatcher(None, norm_user, norm_correct).ratio()
+            is_correct = ratio > 0.70
 
             if is_correct:
                 feedback = 'correct'
@@ -507,18 +733,19 @@ def rev_question():
                 session.pop('index', None)
                 return render_template('full_rev.html', question=None, feedback=None, show_answer=False, skipped_questions=None)
         elif action == 'submit':
-            question_text = g.question_translations.get(q_data['question'], q_data['question'])
-            answer_text = g.question_translations.get(q_data['answer'], q_data['answer'])
-            try:
-            # bey bey space
-                user_expr = sympify(user_input.replace(" ", ""))
-                correct_expr = sympify(correct_answer.replace(" ", ""))
-                user_value = user_expr.evalf()
-                correct_value = correct_expr.evalf()
-                is_correct = isclose(float(user_value), float(correct_value), rel_tol=1e-9)
-            except (SympifyError, ValueError, TypeError):
-            # string cmp
-                is_correct = (user_input.replace(" ", "").lower() == correct_answer.replace(" ", "").lower())
+            def normalize(text):
+                lemmatizer = WordNetLemmatizer()
+                text = text.lower().strip()
+                text = re.sub(r'\s+', ' ', text)
+                words = text.split()
+                return ' '.join([lemmatizer.lemmatize(word) for word in words])
+
+            norm_user = normalize(user_input)
+            norm_correct = normalize(translated_correct_answer)
+
+            ratio = SequenceMatcher(None, norm_user, norm_correct).ratio()
+            is_correct = ratio > 0.70 
+
 
             if is_correct:
                 feedback = "Correct!"
@@ -568,3 +795,25 @@ def rev_question():
         session.pop('questions', None)
         session.pop('index', None)
         return render_template('full_rev.html', question=None, skipped_questions=None)
+
+
+
+@questions_bp.route('/search_questions', methods=['GET', 'POST'])
+@login_required
+def search_questions():
+    results = None
+    query = ""
+
+    if request.method == 'POST':
+        query = request.form.get('query', '').strip()
+        if not query:
+            flash("Please enter a search term.")
+            return redirect(url_for('questions.search_questions'))
+
+        try:
+            results = semantic_search_in_csv(query, file_path=QUESTIONS_CSV, column='question')
+        except Exception as e:
+            flash(f"Search failed: {str(e)}")
+            results = []
+
+    return render_template('search_combined.html', results=results, query=query)
