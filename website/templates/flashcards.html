@@ -117,9 +117,8 @@
 <div class="container center-wrapper">
     <div class="card-box fade-in">
             <h1 class="mb-4 text-primary text-center">{{ t('Flashcards Quiz') }}</h1>
-
-        {% if question %}
             <p class="question-text">{{ question_text }}</p>
+        {% if question %}
 
             <form method="POST">
                 <input type="hidden" name="correct_answer" value="{{ question.answer }}">

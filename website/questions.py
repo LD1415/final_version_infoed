@@ -360,18 +360,17 @@ def questionnaire():
                 session.pop('index', None)
                 return render_template('flashcards.html', question=None, feedback=None, show_answer=False, skipped_questions=None)
         elif action == 'submit':
-            def normalize(text):
-                lemmatizer = WordNetLemmatizer()
-                text = text.lower().strip()
-                text = re.sub(r'\s+', ' ', text)
-                words = text.split()
-                return ' '.join([lemmatizer.lemmatize(word) for word in words])
-
-            norm_user = normalize(user_input)
-            norm_correct = normalize(translated_correct_answer)
-
+            def normalize_for_match(text):
+                return ' '.join(normalize_text(text))
+            norm_user = normalize_for_match(user_input)
+            norm_correct = normalize_for_match(translated_correct_answer)
             ratio = SequenceMatcher(None, norm_user, norm_correct).ratio()
-            is_correct = ratio > 0.75 
+
+            if ratio >= 0.75:
+                is_correct = True
+            else:
+                score = evaluate_user_answer(user_input, translated_correct_answer)
+                is_correct = score >= 0.75
 
 #            # bey bey space
  #               user_expr = sympify(user_input.replace(" ", ""))
@@ -518,18 +517,17 @@ def answer_skipped(question_id):
             correct_answer = current_question.answer.strip()
             translated_correct_answer = g.question_translations.get(correct_answer, correct_answer)
 
-            def normalize(text):
-                lemmatizer = WordNetLemmatizer()
-                text = text.lower().strip()
-                text = re.sub(r'\s+', ' ', text)
-                words = text.split()
-                return ' '.join([lemmatizer.lemmatize(word) for word in words])
-
-            norm_user = normalize(user_input)
-            norm_correct = normalize(translated_correct_answer)
-
+            def normalize_for_match(text):
+                return ' '.join(normalize_text(text))
+            norm_user = normalize_for_match(user_input)
+            norm_correct = normalize_for_match(translated_correct_answer)
             ratio = SequenceMatcher(None, norm_user, norm_correct).ratio()
-            is_correct = ratio > 0.70
+
+            if ratio >= 0.70:
+                is_correct = True
+            else:
+                score = evaluate_user_answer(user_input, translated_correct_answer)
+                is_correct = score >= 0.70
 
             if is_correct:
                 feedback = 'correct'
@@ -733,18 +731,17 @@ def rev_question():
                 session.pop('index', None)
                 return render_template('full_rev.html', question=None, feedback=None, show_answer=False, skipped_questions=None)
         elif action == 'submit':
-            def normalize(text):
-                lemmatizer = WordNetLemmatizer()
-                text = text.lower().strip()
-                text = re.sub(r'\s+', ' ', text)
-                words = text.split()
-                return ' '.join([lemmatizer.lemmatize(word) for word in words])
-
-            norm_user = normalize(user_input)
-            norm_correct = normalize(translated_correct_answer)
-
+            def normalize_for_match(text):
+                return ' '.join(normalize_text(text))
+            norm_user = normalize_for_match(user_input)
+            norm_correct = normalize_for_match(translated_correct_answer)
             ratio = SequenceMatcher(None, norm_user, norm_correct).ratio()
-            is_correct = ratio > 0.70 
+
+            if ratio >= 0.75:
+                is_correct = True
+            else:
+                score = evaluate_user_answer(user_input, translated_correct_answer)
+                is_correct = score >= 0.75
 
 
             if is_correct:
